@@ -1,0 +1,13 @@
+{
+  "mcp": {
+    "servers": {
+      "swift-health-kit": {
+        "command": "npx",
+        "args": [
+          "-y",
+          "@trustedskills/swift-health-kit"
+        ]
+      }
+    }
+  }
+}
