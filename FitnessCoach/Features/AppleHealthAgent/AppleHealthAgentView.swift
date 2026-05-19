@@ -41,10 +41,10 @@ struct AppleHealthAgentView: View {
             }
         })
         .task {
-            model.loadMockData(dailyGoal: dailyGoal)
+            await model.loadData(dailyGoal: dailyGoal)
         }
         .onChange(of: dailyGoal) { newValue in
-            model.loadMockData(dailyGoal: newValue)
+            Task { await model.loadData(dailyGoal: newValue) }
         }
     }
 
@@ -121,7 +121,7 @@ struct AppleHealthAgentView: View {
     }
 
     private func refreshData() {
-        model.loadMockData(dailyGoal: dailyGoal)
+        Task { await model.loadData(dailyGoal: dailyGoal) }
     }
 }
 

@@ -16,6 +16,7 @@ struct CoachChatView: View {
     private let quickPrompts = [
         "How can I hit my calorie goal today?",
         "Give me a short workout based on my progress.",
+        "Give me a personalized meal recommendation for today.",
         "What should I eat after training?",
         "How should I recover tonight?"
     ]

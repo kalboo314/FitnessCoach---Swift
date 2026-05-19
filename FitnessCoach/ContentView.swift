@@ -33,6 +33,14 @@ struct ContentView: View {
                 Label("Coach", systemImage: "message.fill")
             }
             .tag(AppTab.coach)
+
+            NavigationStack {
+                MoveCorrectionView()
+            }
+            .tabItem {
+                Label("Fix My Move", systemImage: "camera.viewfinder")
+            }
+            .tag(AppTab.moveCorrection)
         }
         .task(loadDashboard)
         .onChange(of: dailyCalorieGoal) { newValue in

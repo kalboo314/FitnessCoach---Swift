@@ -12,6 +12,7 @@ import SwiftUI
 @MainActor
 final class AppleHealthAgentModel: ObservableObject {
     private let agent = AppleHealthAgent()
+    private let healthKitService = HealthKitService()
 
     @Published var currentResponse: A2AResponse?
     @Published var error: String?
@@ -67,6 +68,47 @@ final class AppleHealthAgentModel: ObservableObject {
             return Color.orange
         case .notAvailable:
             return Color.gray
+        }
+    }
+
+    func loadData(dailyGoal: Double) async {
+        if healthKitService.usesMockData || !healthKitService.isAvailable {
+            loadMockData(dailyGoal: dailyGoal)
+            return
+        }
+
+        isLoading = true
+        defer { isLoading = false }
+        error = nil
+
+        do {
+            try await healthKitService.requestAuthorization()
+            let activeEnergy = try await healthKitService.activeEnergyBurnedToday()
+            snapshot = FitnessSnapshot(date: .now, activeEnergyBurned: activeEnergy, dailyGoal: dailyGoal)
+            healthAccessState = .authorized
+
+            let formatter = ISO8601DateFormatter()
+            let now = formatter.string(from: Date())
+            let startOfDay = formatter.string(from: Calendar.current.startOfDay(for: Date()))
+
+            currentResponse = A2AResponse(
+                agent: AgentMetadata(name: "AppleHealthAgent", version: "1.0.0", source: "HealthKit"),
+                timestamp: now,
+                data: HealthData(
+                    calories: CalorieData(
+                        active: activeEnergy,
+                        resting: 0,
+                        total: activeEnergy,
+                        unit: "kcal",
+                        period: DatePeriod(startDate: startOfDay, endDate: now)
+                    ),
+                    summary: HealthSummary(lastUpdated: now, dataPoints: 1)
+                )
+            )
+        } catch {
+            healthAccessState = .denied
+            self.error = "Could not read Apple Health data. Make sure Active Energy access is allowed in Settings > Health."
+            currentResponse = nil
         }
     }
 

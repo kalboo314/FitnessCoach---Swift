@@ -83,6 +83,38 @@ struct FitnessDashboardView: View {
                 .clipShape(RoundedRectangle(cornerRadius: AppTheme.cornerRadius))
                 .shadow(color: AppTheme.shadow, radius: 18, y: 8)
 
+                VStack(alignment: .leading, spacing: 12) {
+                    Label("Personalized Meal Recommendation", systemImage: model.mealRecommendation.systemImage)
+                        .font(.headline)
+                        .foregroundStyle(mealRecommendationTint)
+
+                    Text(model.mealRecommendation.title)
+                        .font(.title3)
+                        .bold()
+
+                    Text(model.mealRecommendation.detail)
+                        .font(.body)
+                        .foregroundStyle(.secondary)
+
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text(model.mealRecommendation.mealIdea)
+                            .font(.body.weight(.medium))
+
+                        Text(model.mealRecommendation.timing)
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                    }
+                    .padding(14)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(mealRecommendationTint.opacity(0.10))
+                    .clipShape(RoundedRectangle(cornerRadius: 18))
+                }
+                .padding(AppTheme.cardPadding)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(AppTheme.cardBackground)
+                .clipShape(RoundedRectangle(cornerRadius: AppTheme.cornerRadius))
+                .shadow(color: AppTheme.shadow, radius: 18, y: 8)
+
                 NavigationLink(destination: CoachChatView(model: CoachChatModel(), snapshot: model.snapshot)) {
                     VStack(alignment: .leading, spacing: 10) {
                         Label("Recommendations", systemImage: "message.fill")
@@ -218,6 +250,21 @@ struct FitnessDashboardView: View {
             return .orange
         case .notAvailable:
             return .gray
+        }
+    }
+
+    private var mealRecommendationTint: Color {
+        switch model.mealRecommendation.tintName {
+        case "green":
+            return .green
+        case "orange":
+            return .orange
+        case "blue":
+            return .blue
+        case "yellow":
+            return .yellow
+        default:
+            return .teal
         }
     }
 
