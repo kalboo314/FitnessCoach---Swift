@@ -7,6 +7,7 @@
 
 import Foundation
 import Combine
+import SwiftUI
 
 @MainActor
 final class FitnessDashboardModel: ObservableObject {
@@ -19,9 +20,14 @@ final class FitnessDashboardModel: ObservableObject {
     @Published var errorMessage: String?
     @Published var isUsingMockHealthData = false
 
+    @AppStorage("userFitnessGoalRaw") private var goalRaw: String = FitnessGoal.maintain.rawValue
+
+    private var fitnessGoal: FitnessGoal { FitnessGoal(rawValue: goalRaw) ?? .maintain }
+
     private let healthKitService: HealthKitService
     private let recommendationEngine: WorkoutRecommendationEngine
     private let mealRecommendationEngine: MealRecommendationEngine
+    private var cancellables = Set<AnyCancellable>()
 
     init(
         healthKitService: HealthKitService = HealthKitService(),
@@ -36,6 +42,14 @@ final class FitnessDashboardModel: ObservableObject {
         snapshot = initialSnapshot
         recommendations = recommendationEngine.recommendations(for: initialSnapshot)
         mealRecommendation = mealRecommendationEngine.recommendation(for: initialSnapshot)
+
+        NotificationCenter.default.publisher(for: .workoutProgressDidUpdate)
+            .compactMap { $0.userInfo?["calories"] as? Double }
+            .receive(on: RunLoop.main)
+            .sink { [weak self] calories in
+                self?.applyCompletedWorkoutCalories(calories)
+            }
+            .store(in: &cancellables)
     }
 
     func load(goal: Double) async {
@@ -116,8 +130,17 @@ final class FitnessDashboardModel: ObservableObject {
     }
 
     private func refreshRecommendations() {
-        recommendations = recommendationEngine.recommendations(for: snapshot)
+        recommendations = recommendationEngine.recommendations(for: snapshot, goal: fitnessGoal)
         mealRecommendation = mealRecommendationEngine.recommendation(for: snapshot)
+    }
+
+    private func applyCompletedWorkoutCalories(_ calories: Double) {
+        guard calories > 0 else { return }
+
+        snapshot = snapshot.updatingActiveEnergy(snapshot.activeEnergyBurned + calories)
+        lastUpdated = .now
+        errorMessage = nil
+        refreshRecommendations()
     }
 }
 

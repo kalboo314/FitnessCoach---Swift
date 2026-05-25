@@ -9,9 +9,18 @@ import SwiftUI
 
 struct ContentView: View {
     @AppStorage("dailyCalorieGoal") private var dailyCalorieGoal = 650.0
+    @AppStorage("appColorScheme") private var colorSchemeRaw = "system"
     @State private var selectedTab = AppTab.dashboard
     @StateObject private var model = FitnessDashboardModel()
     @StateObject private var chatModel = CoachChatModel()
+
+    private var preferredColorScheme: ColorScheme? {
+        switch colorSchemeRaw {
+        case "light": return .light
+        case "dark": return .dark
+        default: return nil
+        }
+    }
 
     var body: some View {
         TabView(selection: $selectedTab) {
@@ -35,13 +44,22 @@ struct ContentView: View {
             .tag(AppTab.coach)
 
             NavigationStack {
-                MoveCorrectionView()
+                WorkoutPlannerView()
             }
             .tabItem {
-                Label("Fix My Move", systemImage: "camera.viewfinder")
+                Label("Workout", systemImage: "figure.strengthtraining.traditional")
             }
             .tag(AppTab.moveCorrection)
+
+            NavigationStack {
+                UserProfileView()
+            }
+            .tabItem {
+                Label("Profile", systemImage: "person.circle.fill")
+            }
+            .tag(AppTab.profile)
         }
+        .preferredColorScheme(preferredColorScheme)
         .task(loadDashboard)
         .onChange(of: dailyCalorieGoal) { newValue in
             Task {

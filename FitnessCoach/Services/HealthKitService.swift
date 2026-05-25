@@ -39,11 +39,37 @@ struct HealthKitService {
     }
 
     func requestAuthorization() async throws {
-        guard !usesMockData else {
-            return
-        }
+        guard !usesMockData else { return }
+        try await healthStore.requestAuthorization(
+            toShare: [HKObjectType.workoutType()],
+            read: [activeEnergyType]
+        )
+    }
 
-        try await healthStore.requestAuthorization(toShare: [], read: [activeEnergyType])
+    func saveWorkout(estimatedCalories: Double, durationMinutes: Int) async throws {
+        guard !usesMockData, HKHealthStore.isHealthDataAvailable() else { return }
+
+        let end = Date()
+        let start = end.addingTimeInterval(-Double(durationMinutes) * 60)
+        let energy = HKQuantity(unit: .kilocalorie(), doubleValue: estimatedCalories)
+
+        let workout = HKWorkout(
+            activityType: .traditionalStrengthTraining,
+            start: start,
+            end: end,
+            duration: Double(durationMinutes) * 60,
+            totalEnergyBurned: energy,
+            totalDistance: nil,
+            device: .local(),
+            metadata: nil
+        )
+
+        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+            healthStore.save(workout) { _, error in
+                if let error { continuation.resume(throwing: error) }
+                else { continuation.resume() }
+            }
+        }
     }
 
     func activeEnergyBurnedToday() async throws -> Double {

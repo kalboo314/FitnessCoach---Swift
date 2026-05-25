@@ -13,14 +13,9 @@ enum AppTheme {
     static let cardSpacing = 16.0
     static let largeSpacing = 24.0
     static let cornerRadius = 28.0
-    static let background = LinearGradient(
-        colors: [
-            Color(red: 0.95, green: 0.98, blue: 0.96),
-            Color(red: 0.99, green: 0.96, blue: 0.90)
-        ],
-        startPoint: .topLeading,
-        endPoint: .bottomTrailing
-    )
-    static let cardBackground = Color.white.opacity(0.92)
-    static let shadow = Color.black.opacity(0.08)
+
+    // Adaptive system colors — automatically switch between light and dark mode.
+    static var background: Color { Color(UIColor.systemGroupedBackground) }
+    static var cardBackground: Color { Color(UIColor.secondarySystemGroupedBackground) }
+    static var shadow: Color { Color.black.opacity(0.06) }
 }

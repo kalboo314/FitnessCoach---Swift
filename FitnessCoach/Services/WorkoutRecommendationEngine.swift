@@ -8,7 +8,78 @@
 import SwiftUI
 
 struct WorkoutRecommendationEngine {
-    func recommendations(for snapshot: FitnessSnapshot) -> [WorkoutRecommendation] {
+    func recommendations(for snapshot: FitnessSnapshot, goal: FitnessGoal = .maintain) -> [WorkoutRecommendation] {
+        let goalRecs = goalBasedRecommendations(for: goal)
+        if !goalRecs.isEmpty { return goalRecs }
+        return calorieBased(snapshot: snapshot)
+    }
+
+    // MARK: - Goal-based workouts
+
+    private func goalBasedRecommendations(for goal: FitnessGoal) -> [WorkoutRecommendation] {
+        switch goal {
+        case .maintain:
+            return []
+        case .increaseMass:
+            return [
+                WorkoutRecommendation(
+                    title: "Heavy Compound Lift",
+                    detail: "Squat, deadlift, or bench press. Work up to 3–5 sets of 4–6 reps at 80–85% of your max to drive muscle growth.",
+                    systemImage: "figure.strengthtraining.traditional",
+                    tint: .blue,
+                    estimatedActiveCalories: 280,
+                    durationMinutes: 50
+                ),
+                WorkoutRecommendation(
+                    title: "Upper Body Push & Pull",
+                    detail: "Overhead press, bent-over rows, dips, and pull-ups. Aim for 3–4 sets of 6–10 reps per movement.",
+                    systemImage: "dumbbell.fill",
+                    tint: .indigo,
+                    estimatedActiveCalories: 240,
+                    durationMinutes: 45
+                ),
+                WorkoutRecommendation(
+                    title: "Leg Hypertrophy Session",
+                    detail: "Leg press, Romanian deadlifts, lunges, and calf raises. Higher volume (4 × 8–12) for maximum leg growth.",
+                    systemImage: "figure.run",
+                    tint: .purple,
+                    estimatedActiveCalories: 320,
+                    durationMinutes: 55
+                )
+            ]
+        case .decreaseWeight:
+            return [
+                WorkoutRecommendation(
+                    title: "HIIT Cardio",
+                    detail: "20-second all-out efforts followed by 40 seconds of rest, repeated 10–15 times. Burns calories long after you finish.",
+                    systemImage: "bolt.heart.fill",
+                    tint: .orange,
+                    estimatedActiveCalories: 350,
+                    durationMinutes: 25
+                ),
+                WorkoutRecommendation(
+                    title: "Full-Body Circuit",
+                    detail: "Rotate through squats, push-ups, rows, and jumping jacks with minimal rest. 3–4 rounds keeps your heart rate high.",
+                    systemImage: "arrow.triangle.2.circlepath",
+                    tint: .red,
+                    estimatedActiveCalories: 300,
+                    durationMinutes: 35
+                ),
+                WorkoutRecommendation(
+                    title: "Steady-State Cardio",
+                    detail: "A 40–50 minute brisk walk, jog, or bike ride at a pace where you can still hold a conversation.",
+                    systemImage: "figure.outdoor.cycle",
+                    tint: .mint,
+                    estimatedActiveCalories: 280,
+                    durationMinutes: 45
+                )
+            ]
+        }
+    }
+
+    // MARK: - Calorie-gap fallback (used for .maintain goal)
+
+    private func calorieBased(snapshot: FitnessSnapshot) -> [WorkoutRecommendation] {
         if snapshot.isGoalMet {
             return [
                 WorkoutRecommendation(

@@ -44,6 +44,21 @@
 		C00100010000000000000024 /* AppleHealthMetricRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00100000000000000000024 /* AppleHealthMetricRowView.swift */; };
 		C00100010000000000000025 /* MoveCorrectionModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00100000000000000000025 /* MoveCorrectionModel.swift */; };
 		C00100010000000000000026 /* MoveCorrectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00100000000000000000026 /* MoveCorrectionView.swift */; };
+		C00100010000000000000029 /* FitnessGoal.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00100000000000000000029 /* FitnessGoal.swift */; };
+		C0010001000000000000002A /* UserProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0010000000000000000002A /* UserProfile.swift */; };
+		C0010001000000000000002B /* UserProfileModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0010000000000000000002B /* UserProfileModel.swift */; };
+		C0010001000000000000002C /* UserProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0010000000000000000002C /* UserProfileView.swift */; };
+		C0010001000000000000002E /* Exercise.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0010000000000000000002E /* Exercise.swift */; };
+		C0010001000000000000002F /* ExerciseAPIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0010000000000000000002F /* ExerciseAPIService.swift */; };
+		C00100010000000000000030 /* WorkoutPlannerModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00100000000000000000030 /* WorkoutPlannerModel.swift */; };
+		C00100010000000000000031 /* WorkoutPlannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00100000000000000000031 /* WorkoutPlannerView.swift */; };
+		C00100010000000000000032 /* WorkoutPlanDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00100000000000000000032 /* WorkoutPlanDetailView.swift */; };
+		C00100010000000000000033 /* ActiveWorkoutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00100000000000000000033 /* ActiveWorkoutView.swift */; };
+		C00100010000000000000035 /* MovementAnalysis.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00100000000000000000035 /* MovementAnalysis.swift */; };
+		C00100010000000000000036 /* MovementCameraSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00100000000000000000036 /* MovementCameraSession.swift */; };
+		C00100010000000000000037 /* MovementCameraPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00100000000000000000037 /* MovementCameraPreview.swift */; };
+		C00100010000000000000038 /* MovementOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00100000000000000000038 /* MovementOverlayView.swift */; };
+		C00100010000000000000039 /* WorkoutMovementTrackingModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00100000000000000000039 /* WorkoutMovementTrackingModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -105,6 +120,21 @@
 		C00100000000000000000024 /* AppleHealthMetricRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleHealthMetricRowView.swift; sourceTree = "<group>"; };
 		C00100000000000000000025 /* MoveCorrectionModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoveCorrectionModel.swift; sourceTree = "<group>"; };
 		C00100000000000000000026 /* MoveCorrectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoveCorrectionView.swift; sourceTree = "<group>"; };
+		C00100000000000000000029 /* FitnessGoal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FitnessGoal.swift; sourceTree = "<group>"; };
+		C0010000000000000000002A /* UserProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfile.swift; sourceTree = "<group>"; };
+		C0010000000000000000002B /* UserProfileModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfileModel.swift; sourceTree = "<group>"; };
+		C0010000000000000000002C /* UserProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfileView.swift; sourceTree = "<group>"; };
+		C0010000000000000000002E /* Exercise.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Exercise.swift; sourceTree = "<group>"; };
+		C0010000000000000000002F /* ExerciseAPIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseAPIService.swift; sourceTree = "<group>"; };
+		C00100000000000000000030 /* WorkoutPlannerModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutPlannerModel.swift; sourceTree = "<group>"; };
+		C00100000000000000000031 /* WorkoutPlannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutPlannerView.swift; sourceTree = "<group>"; };
+		C00100000000000000000032 /* WorkoutPlanDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutPlanDetailView.swift; sourceTree = "<group>"; };
+		C00100000000000000000033 /* ActiveWorkoutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveWorkoutView.swift; sourceTree = "<group>"; };
+		C00100000000000000000035 /* MovementAnalysis.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovementAnalysis.swift; sourceTree = "<group>"; };
+		C00100000000000000000036 /* MovementCameraSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovementCameraSession.swift; sourceTree = "<group>"; };
+		C00100000000000000000037 /* MovementCameraPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovementCameraPreview.swift; sourceTree = "<group>"; };
+		C00100000000000000000038 /* MovementOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovementOverlayView.swift; sourceTree = "<group>"; };
+		C00100000000000000000039 /* WorkoutMovementTrackingModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutMovementTrackingModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -168,96 +198,6 @@
 			path = FitnessCoach;
 			sourceTree = "<group>";
 		};
-		C00100000000000000000010 /* Core */ = {
-			isa = PBXGroup;
-			children = (
-				C00100000000000000000001 /* AppTheme.swift */,
-			);
-			path = Core;
-			sourceTree = "<group>";
-		};
-		C00100000000000000000011 /* Models */ = {
-			isa = PBXGroup;
-			children = (
-				C00100000000000000000020 /* A2AResponse.swift */,
-				C00100000000000000000015 /* AppTab.swift */,
-				C00100000000000000000017 /* ChatMessage.swift */,
-				C00100000000000000000016 /* ChatMessageRole.swift */,
-				C00100000000000000000003 /* FitnessSnapshot.swift */,
-				C00100000000000000000004 /* HealthAccessState.swift */,
-				C00100000000000000000005 /* WorkoutRecommendation.swift */,
-			);
-			path = Models;
-			sourceTree = "<group>";
-		};
-		C00100000000000000000012 /* Services */ = {
-			isa = PBXGroup;
-			children = (
-				C00100000000000000000021 /* AppleHealthAgent.swift */,
-				C00100000000000000000018 /* GroqChatService.swift */,
-				C0010000000000000000001F /* GroqVisionService.swift */,
-				C00100000000000000000006 /* HealthKitService.swift */,
-				C00100000000000000000007 /* WorkoutRecommendationEngine.swift */,
-			);
-			path = Services;
-			sourceTree = "<group>";
-		};
-		C00100000000000000000013 /* Features */ = {
-			isa = PBXGroup;
-			children = (
-				C00100000000000000000028 /* AppleHealthAgent */,
-				C0010000000000000000001E /* CoachChat */,
-				C00100000000000000000014 /* Dashboard */,
-				C00100000000000000000027 /* MoveCorrection */,
-			);
-			path = Features;
-			sourceTree = "<group>";
-		};
-		C00100000000000000000028 /* AppleHealthAgent */ = {
-			isa = PBXGroup;
-			children = (
-				C00100000000000000000022 /* AppleHealthAgentModel.swift */,
-				C00100000000000000000023 /* AppleHealthAgentView.swift */,
-				C00100000000000000000024 /* AppleHealthMetricRowView.swift */,
-			);
-			path = AppleHealthAgent;
-			sourceTree = "<group>";
-		};
-		C00100000000000000000027 /* MoveCorrection */ = {
-			isa = PBXGroup;
-			children = (
-				C00100000000000000000025 /* MoveCorrectionModel.swift */,
-				C00100000000000000000026 /* MoveCorrectionView.swift */,
-			);
-			path = MoveCorrection;
-			sourceTree = "<group>";
-		};
-		C0010000000000000000001E /* CoachChat */ = {
-			isa = PBXGroup;
-			children = (
-				C00100000000000000000019 /* CoachChatModel.swift */,
-				C0010000000000000000001A /* CoachChatView.swift */,
-				C0010000000000000000001B /* ChatBubbleView.swift */,
-				C0010000000000000000001C /* CoachContextCardView.swift */,
-				C0010000000000000000001D /* GroqAPIKeyView.swift */,
-			);
-			path = CoachChat;
-			sourceTree = "<group>";
-		};
-		C00100000000000000000014 /* Dashboard */ = {
-			isa = PBXGroup;
-			children = (
-				C00100000000000000000008 /* FitnessDashboardModel.swift */,
-				C00100000000000000000009 /* FitnessDashboardView.swift */,
-				C0010000000000000000000A /* GoalEditorView.swift */,
-				C0010000000000000000000B /* HealthStatusCardView.swift */,
-				C0010000000000000000000C /* MetricCardView.swift */,
-				C0010000000000000000000D /* ProgressRingView.swift */,
-				C0010000000000000000000E /* RecommendationCardView.swift */,
-			);
-			path = Dashboard;
-			sourceTree = "<group>";
-		};
 		57AAE5832FAC2416001B5E6F /* Preview Content */ = {
 			isa = PBXGroup;
 			children = (
@@ -281,6 +221,127 @@
 				57AAE59A2FAC2416001B5E6F /* FitnessCoachUITestsLaunchTests.swift */,
 			);
 			path = FitnessCoachUITests;
+			sourceTree = "<group>";
+		};
+		C00100000000000000000010 /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				C00100000000000000000001 /* AppTheme.swift */,
+			);
+			path = Core;
+			sourceTree = "<group>";
+		};
+		C00100000000000000000011 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				C00100000000000000000020 /* A2AResponse.swift */,
+				C00100000000000000000015 /* AppTab.swift */,
+				C00100000000000000000017 /* ChatMessage.swift */,
+				C00100000000000000000016 /* ChatMessageRole.swift */,
+				C0010000000000000000002E /* Exercise.swift */,
+				C00100000000000000000029 /* FitnessGoal.swift */,
+				C00100000000000000000003 /* FitnessSnapshot.swift */,
+				C00100000000000000000004 /* HealthAccessState.swift */,
+				C0010000000000000000002A /* UserProfile.swift */,
+				C00100000000000000000005 /* WorkoutRecommendation.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		C00100000000000000000012 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				C00100000000000000000021 /* AppleHealthAgent.swift */,
+				C0010000000000000000002F /* ExerciseAPIService.swift */,
+				C00100000000000000000018 /* GroqChatService.swift */,
+				C0010000000000000000001F /* GroqVisionService.swift */,
+				C00100000000000000000006 /* HealthKitService.swift */,
+				C00100000000000000000007 /* WorkoutRecommendationEngine.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		C00100000000000000000013 /* Features */ = {
+			isa = PBXGroup;
+			children = (
+				C00100000000000000000028 /* AppleHealthAgent */,
+				C0010000000000000000001E /* CoachChat */,
+				C00100000000000000000014 /* Dashboard */,
+				C00100000000000000000027 /* MoveCorrection */,
+				C0010000000000000000002D /* Profile */,
+				C00100000000000000000034 /* WorkoutPlanner */,
+			);
+			path = Features;
+			sourceTree = "<group>";
+		};
+		C00100000000000000000034 /* WorkoutPlanner */ = {
+			isa = PBXGroup;
+			children = (
+				C00100000000000000000030 /* WorkoutPlannerModel.swift */,
+				C00100000000000000000031 /* WorkoutPlannerView.swift */,
+				C00100000000000000000032 /* WorkoutPlanDetailView.swift */,
+				C00100000000000000000033 /* ActiveWorkoutView.swift */,
+				C00100000000000000000039 /* WorkoutMovementTrackingModel.swift */,
+			);
+			path = WorkoutPlanner;
+			sourceTree = "<group>";
+		};
+		C0010000000000000000002D /* Profile */ = {
+			isa = PBXGroup;
+			children = (
+				C0010000000000000000002B /* UserProfileModel.swift */,
+				C0010000000000000000002C /* UserProfileView.swift */,
+			);
+			path = Profile;
+			sourceTree = "<group>";
+		};
+		C00100000000000000000014 /* Dashboard */ = {
+			isa = PBXGroup;
+			children = (
+				C00100000000000000000008 /* FitnessDashboardModel.swift */,
+				C00100000000000000000009 /* FitnessDashboardView.swift */,
+				C0010000000000000000000A /* GoalEditorView.swift */,
+				C0010000000000000000000B /* HealthStatusCardView.swift */,
+				C0010000000000000000000C /* MetricCardView.swift */,
+				C0010000000000000000000D /* ProgressRingView.swift */,
+				C0010000000000000000000E /* RecommendationCardView.swift */,
+			);
+			path = Dashboard;
+			sourceTree = "<group>";
+		};
+		C0010000000000000000001E /* CoachChat */ = {
+			isa = PBXGroup;
+			children = (
+				C00100000000000000000019 /* CoachChatModel.swift */,
+				C0010000000000000000001A /* CoachChatView.swift */,
+				C0010000000000000000001B /* ChatBubbleView.swift */,
+				C0010000000000000000001C /* CoachContextCardView.swift */,
+				C0010000000000000000001D /* GroqAPIKeyView.swift */,
+			);
+			path = CoachChat;
+			sourceTree = "<group>";
+		};
+		C00100000000000000000027 /* MoveCorrection */ = {
+			isa = PBXGroup;
+			children = (
+				C00100000000000000000035 /* MovementAnalysis.swift */,
+				C00100000000000000000036 /* MovementCameraSession.swift */,
+				C00100000000000000000037 /* MovementCameraPreview.swift */,
+				C00100000000000000000038 /* MovementOverlayView.swift */,
+				C00100000000000000000025 /* MoveCorrectionModel.swift */,
+				C00100000000000000000026 /* MoveCorrectionView.swift */,
+			);
+			path = MoveCorrection;
+			sourceTree = "<group>";
+		};
+		C00100000000000000000028 /* AppleHealthAgent */ = {
+			isa = PBXGroup;
+			children = (
+				C00100000000000000000022 /* AppleHealthAgentModel.swift */,
+				C00100000000000000000023 /* AppleHealthAgentView.swift */,
+				C00100000000000000000024 /* AppleHealthMetricRowView.swift */,
+			);
+			path = AppleHealthAgent;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -443,8 +504,23 @@
 				C00100010000000000000022 /* AppleHealthAgentModel.swift in Sources */,
 				C00100010000000000000023 /* AppleHealthAgentView.swift in Sources */,
 				C00100010000000000000024 /* AppleHealthMetricRowView.swift in Sources */,
+				C00100010000000000000035 /* MovementAnalysis.swift in Sources */,
+				C00100010000000000000036 /* MovementCameraSession.swift in Sources */,
+				C00100010000000000000037 /* MovementCameraPreview.swift in Sources */,
+				C00100010000000000000038 /* MovementOverlayView.swift in Sources */,
 				C00100010000000000000025 /* MoveCorrectionModel.swift in Sources */,
 				C00100010000000000000026 /* MoveCorrectionView.swift in Sources */,
+				C00100010000000000000029 /* FitnessGoal.swift in Sources */,
+				C0010001000000000000002A /* UserProfile.swift in Sources */,
+				C0010001000000000000002B /* UserProfileModel.swift in Sources */,
+				C0010001000000000000002C /* UserProfileView.swift in Sources */,
+				C0010001000000000000002E /* Exercise.swift in Sources */,
+				C0010001000000000000002F /* ExerciseAPIService.swift in Sources */,
+				C00100010000000000000030 /* WorkoutPlannerModel.swift in Sources */,
+				C00100010000000000000031 /* WorkoutPlannerView.swift in Sources */,
+				C00100010000000000000032 /* WorkoutPlanDetailView.swift in Sources */,
+				C00100010000000000000033 /* ActiveWorkoutView.swift in Sources */,
+				C00100010000000000000039 /* WorkoutMovementTrackingModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -604,6 +680,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"FitnessCoach/Preview Content\"";
+				DEVELOPMENT_TEAM = AKWAN7LLB7;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSCameraUsageDescription = "Fitness Coach uses the camera to analyse your exercise form and give real-time AI coaching feedback.";
@@ -637,6 +714,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"FitnessCoach/Preview Content\"";
+				DEVELOPMENT_TEAM = AKWAN7LLB7;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSCameraUsageDescription = "Fitness Coach uses the camera to analyse your exercise form and give real-time AI coaching feedback.";

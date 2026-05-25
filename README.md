@@ -6,6 +6,15 @@ A modern SwiftUI fitness coaching application powered by AI, featuring HealthKit
 
 FitnessCoach is an iOS application that combines Apple HealthKit data with AI-powered chat capabilities to provide personalized fitness coaching. The app features an innovative AppleHealthAgent persona that retrieves and analyzes your health metrics in an A2A JSON format.
 
+## Recent changes (2026-05-25)
+
+- Added MoveCorrection feature: new movement analysis utilities, camera preview,
+  and overlay views for exercise form feedback.
+- Updated dashboard models and views to surface MoveCorrection recommendations.
+- Service improvements: enhancements to `WorkoutRecommendationEngine` and
+  `HealthKitService` to support real-time movement analysis data.
+
+
 ## Features
 
 ### 🏥 Health Integration

@@ -115,6 +115,43 @@ struct FitnessDashboardView: View {
                 .clipShape(RoundedRectangle(cornerRadius: AppTheme.cornerRadius))
                 .shadow(color: AppTheme.shadow, radius: 18, y: 8)
 
+                // Workout planner entry card
+                NavigationLink(destination: WorkoutPlannerView()) {
+                    VStack(alignment: .leading, spacing: 12) {
+                        HStack {
+                            Label("Plan Your Workout", systemImage: "figure.strengthtraining.traditional")
+                                .font(.headline)
+                                .foregroundStyle(.purple)
+                            Spacer()
+                            Image(systemName: "arrow.right.circle.fill")
+                                .foregroundStyle(.purple.opacity(0.5))
+                        }
+
+                        Text("Tell us how long you have and your intensity. We’ll build a personalised plan with real exercises and estimate your calorie burn.")
+                            .font(.body)
+                            .foregroundStyle(.secondary)
+
+                        HStack(spacing: 8) {
+                            ForEach(["15 min", "30 min", "45 min", "60 min"], id: \.self) { t in
+                                Text(t)
+                                    .font(.caption.weight(.semibold))
+                                    .foregroundStyle(.purple)
+                                    .padding(.horizontal, 8)
+                                    .padding(.vertical, 4)
+                                    .background(Color.purple.opacity(0.1))
+                                    .clipShape(Capsule())
+                            }
+                        }
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(AppTheme.cardPadding)
+                    .background(AppTheme.cardBackground)
+                    .clipShape(RoundedRectangle(cornerRadius: AppTheme.cornerRadius))
+                    .shadow(color: AppTheme.shadow, radius: 18, y: 8)
+                }
+                .buttonStyle(.plain)
+
+                // AI coach entry card
                 NavigationLink(destination: CoachChatView(model: CoachChatModel(), snapshot: model.snapshot)) {
                     VStack(alignment: .leading, spacing: 10) {
                         Label("Recommendations", systemImage: "message.fill")

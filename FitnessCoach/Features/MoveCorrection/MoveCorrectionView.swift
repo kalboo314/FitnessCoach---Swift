@@ -18,6 +18,8 @@ struct MoveCorrectionView: View {
             VStack(alignment: .leading, spacing: AppTheme.largeSpacing) {
                 introCard
 
+                modePicker
+
                 if groqApiKey.isEmpty {
                     HealthStatusCardView(
                         state: .unknown,
@@ -27,10 +29,14 @@ struct MoveCorrectionView: View {
                     )
                 }
 
-                photoSourceButtons
+                if model.selectedMode == .live {
+                    liveTrackingCard
+                } else {
+                    photoSourceButtons
 
-                if let image = model.selectedImage {
-                    selectedImageCard(image: image)
+                    if let image = model.selectedImage {
+                        selectedImageCard(image: image)
+                    }
                 }
 
                 if let errorMessage = model.errorMessage {
@@ -60,11 +66,29 @@ struct MoveCorrectionView: View {
             ToolbarItem(placement: .navigationBarLeading) {
                 Button("Groq Key") { isShowingAPIKeySheet = true }
             }
-            if model.selectedImage != nil {
+            if model.selectedMode == .photo, model.selectedImage != nil {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Clear") { model.clearImage() }
                 }
             }
+        }
+        .task {
+            await model.requestCameraAccessIfNeeded()
+            model.startCamera()
+        }
+        .onDisappear {
+            model.stopCamera()
+        }
+        .onChange(of: model.selectedMode) { newMode in
+            if newMode == .live {
+                model.startCamera()
+                model.resetLiveSession()
+            } else {
+                model.stopCamera()
+            }
+        }
+        .onChange(of: model.selectedExercise) { _ in
+            model.resetLiveSession()
         }
         .sheet(isPresented: $isShowingImagePicker) {
             ImagePickerView(sourceType: imagePickerSource) { image in
@@ -84,9 +108,65 @@ struct MoveCorrectionView: View {
                 .font(.headline)
                 .foregroundStyle(.blue)
 
-            Text("Take a photo or pick one from your library while doing an exercise. Your AI coach will review your posture and give you specific cues to improve.")
+            Text("Use live camera tracking for rep counting and movement reading, or switch to photo mode for a deeper AI posture review.")
                 .font(.body)
                 .foregroundStyle(.secondary)
+        }
+        .padding(AppTheme.cardPadding)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(AppTheme.cardBackground)
+        .clipShape(RoundedRectangle(cornerRadius: AppTheme.cornerRadius))
+        .shadow(color: AppTheme.shadow, radius: 18, y: 8)
+    }
+
+    private var modePicker: some View {
+        Picker("Analysis Mode", selection: $model.selectedMode) {
+            ForEach(MoveCorrectionModel.AnalysisMode.allCases) { mode in
+                Text(mode.title).tag(mode)
+            }
+        }
+        .pickerStyle(.segmented)
+    }
+
+    private var liveTrackingCard: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            exercisePicker
+
+            ZStack(alignment: .topTrailing) {
+                RoundedRectangle(cornerRadius: 24)
+                    .fill(Color.black.opacity(0.9))
+                    .frame(height: 360)
+                    .overlay {
+                        if model.isCameraAuthorized {
+                            ZStack {
+                                MovementCameraPreview(session: model.cameraSession.session)
+                                MovementOverlayView(points: model.skeletonPoints)
+                            }
+                            .clipShape(RoundedRectangle(cornerRadius: 24))
+                        } else {
+                            permissionPlaceholder
+                        }
+                    }
+
+                repBadge
+                    .padding(16)
+            }
+
+            statsRow
+
+            Text(model.liveFeedback)
+                .font(.body)
+                .foregroundStyle(.secondary)
+
+            Text(model.selectedExercise.setupHint)
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+
+            Button(action: model.resetLiveSession) {
+                Label("Reset Counter", systemImage: "arrow.counterclockwise")
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.bordered)
         }
         .padding(AppTheme.cardPadding)
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -153,6 +233,81 @@ struct MoveCorrectionView: View {
         .background(AppTheme.cardBackground)
         .clipShape(RoundedRectangle(cornerRadius: AppTheme.cornerRadius))
         .shadow(color: AppTheme.shadow, radius: 18, y: 8)
+    }
+
+    private var exercisePicker: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("Track Exercise")
+                .font(.headline)
+
+            Picker("Track Exercise", selection: $model.selectedExercise) {
+                ForEach(TrackedExercise.allCases) { exercise in
+                    Label(exercise.title, systemImage: exercise.systemImage)
+                        .tag(exercise)
+                }
+            }
+            .pickerStyle(.menu)
+        }
+    }
+
+    private var repBadge: some View {
+        VStack(alignment: .trailing, spacing: 4) {
+            Text("Reps")
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(.white.opacity(0.8))
+
+            Text("\(model.repCount)")
+                .font(.system(size: 34, weight: .bold, design: .rounded))
+                .foregroundStyle(.white)
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 12)
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 18))
+    }
+
+    private var statsRow: some View {
+        HStack(spacing: 12) {
+            liveStatCard(
+                title: "Stage",
+                value: model.trackingStage == .ready ? "Top" : "Bottom",
+                tint: .blue
+            )
+
+            liveStatCard(
+                title: "Angle",
+                value: model.measuredAngle.map { "\(Int($0.rounded()))°" } ?? "--",
+                tint: .green
+            )
+        }
+    }
+
+    private var permissionPlaceholder: some View {
+        VStack(spacing: 10) {
+            Image(systemName: "camera.fill")
+                .font(.system(size: 30))
+                .foregroundStyle(.white)
+
+            Text("Camera access is required for live movement tracking.")
+                .multilineTextAlignment(.center)
+                .foregroundStyle(.white.opacity(0.9))
+        }
+        .padding()
+    }
+
+    private func liveStatCard(title: String, value: String, tint: Color) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(title)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+
+            Text(value)
+                .font(.title3.bold())
+                .foregroundStyle(tint)
+        }
+        .padding()
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color.white.opacity(0.88))
+        .clipShape(RoundedRectangle(cornerRadius: 18))
     }
 
     private func openCamera() {
