@@ -195,14 +195,31 @@ struct ActiveWorkoutView: View {
                 .padding(14)
             }
 
-            Text(movementTracker.feedback)
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
+            formFeedbackBanner(movementTracker.liveFormCategory, text: movementTracker.feedback)
         }
         .padding(AppTheme.cardPadding)
         .background(AppTheme.cardBackground)
         .clipShape(RoundedRectangle(cornerRadius: AppTheme.cornerRadius))
         .shadow(color: AppTheme.shadow, radius: 18, y: 8)
+    }
+
+    @ViewBuilder
+    private func formFeedbackBanner(_ category: FormFeedbackCategory?, text: String) -> some View {
+        HStack(spacing: 10) {
+            if let cat = category {
+                Image(systemName: cat.systemImage)
+                    .foregroundStyle(cat.color)
+                    .font(.body)
+            }
+            Text(text)
+                .font(.subheadline)
+                .foregroundStyle(category == nil ? .secondary : .primary)
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background((category?.color ?? .clear).opacity(0.08))
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .animation(.easeInOut(duration: 0.2), value: category)
     }
 
     private var topBar: some View {

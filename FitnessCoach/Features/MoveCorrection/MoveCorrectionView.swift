@@ -154,9 +154,7 @@ struct MoveCorrectionView: View {
 
             statsRow
 
-            Text(model.liveFeedback)
-                .font(.body)
-                .foregroundStyle(.secondary)
+            formFeedbackBanner(model.liveFormCategory, text: model.liveFeedback)
 
             Text(model.selectedExercise.setupHint)
                 .font(.footnote)
@@ -292,6 +290,25 @@ struct MoveCorrectionView: View {
                 .foregroundStyle(.white.opacity(0.9))
         }
         .padding()
+    }
+
+    @ViewBuilder
+    private func formFeedbackBanner(_ category: FormFeedbackCategory?, text: String) -> some View {
+        HStack(spacing: 10) {
+            if let cat = category {
+                Image(systemName: cat.systemImage)
+                    .foregroundStyle(cat.color)
+                    .font(.body)
+            }
+            Text(text)
+                .font(.subheadline)
+                .foregroundStyle(category == nil ? .secondary : .primary)
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background((category?.color ?? .clear).opacity(0.08))
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .animation(.easeInOut(duration: 0.2), value: category)
     }
 
     private func liveStatCard(title: String, value: String, tint: Color) -> some View {

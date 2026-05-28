@@ -36,6 +36,7 @@ final class MoveCorrectionModel: ObservableObject {
     @Published var measuredAngle: Double?
     @Published var skeletonPoints: [JointOverlayPoint] = []
     @Published var isCameraAuthorized = false
+    @Published var liveFormCategory: FormFeedbackCategory?
 
     private let visionService = GroqVisionService()
     let cameraSession = MovementCameraSession()
@@ -82,6 +83,7 @@ final class MoveCorrectionModel: ObservableObject {
         measuredAngle = nil
         skeletonPoints = []
         errorMessage = nil
+        liveFormCategory = nil
     }
 
     func startCamera() {
@@ -157,6 +159,7 @@ final class MoveCorrectionModel: ObservableObject {
                     self.liveFeedback = analysis.feedback
                     self.measuredAngle = analysis.angle
                     self.skeletonPoints = analysis.skeleton
+                    self.liveFormCategory = analysis.formCategory
                 }
             } catch {
                 Task { @MainActor in

@@ -18,6 +18,7 @@ final class WorkoutMovementTrackingModel: ObservableObject {
     @Published var isCameraAuthorized = false
     @Published var targetReps = 0
     @Published var formRecords: [RepFormRecord] = []
+    @Published var liveFormCategory: FormFeedbackCategory?
 
     let cameraSession = MovementCameraSession()
 
@@ -87,6 +88,7 @@ final class WorkoutMovementTrackingModel: ObservableObject {
         trackingStage = .ready
         lowestAngleThisRep = nil
         currentSquatFeatures = nil
+        liveFormCategory = nil
     }
 
     func startTrackingIfPossible() {
@@ -166,6 +168,7 @@ final class WorkoutMovementTrackingModel: ObservableObject {
                     self.feedback = analysis.feedback
                     self.measuredAngle = analysis.angle
                     self.skeletonPoints = analysis.skeleton
+                    self.liveFormCategory = analysis.formCategory
                 }
             } catch {
                 Task { @MainActor in
