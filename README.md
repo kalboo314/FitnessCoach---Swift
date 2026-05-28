@@ -6,13 +6,43 @@ A modern SwiftUI fitness coaching application powered by AI, featuring HealthKit
 
 FitnessCoach is an iOS application that combines Apple HealthKit data with AI-powered chat capabilities to provide personalized fitness coaching. The app features an innovative AppleHealthAgent persona that retrieves and analyzes your health metrics in an A2A JSON format.
 
-## Recent changes (2026-05-25)
+## Recent changes (2026-05-28)
 
-- Added MoveCorrection feature: new movement analysis utilities, camera preview,
-  and overlay views for exercise form feedback.
-- Updated dashboard models and views to surface MoveCorrection recommendations.
-- Service improvements: enhancements to `WorkoutRecommendationEngine` and
-  `HealthKitService` to support real-time movement analysis data.
+- **Added MoveCorrection Feature**: Real-time exercise form analysis using pose detection
+  - `MovementAnalysis.swift`: Core pose detection and form classification
+  - `MovementCameraSession.swift`: Real-time video capture and processing
+  - `MovementCameraPreview.swift`: Live camera feed display
+  - `MovementOverlayView.swift`: Visual feedback overlays for form correction
+  - `SquatFormClassifier.swift`: Specialized squat form analysis
+
+- **Added WorkoutPlanner Feature**: Complete workout planning and tracking system
+  - `WorkoutPlannerView.swift`: Main workout planner interface
+  - `WorkoutPlannerModel.swift`: Workout planning logic and state management
+  - `ActiveWorkoutView.swift`: Real-time workout tracking
+  - `CustomWorkoutBuilderView.swift`: Build custom workout routines
+  - `MuscleBodyMapView.swift`: Visual muscle group targeting
+  - `WorkoutFormReportView.swift`: Post-workout form analysis reports
+  - `WorkoutMovementTrackingModel.swift`: Movement tracking during workouts
+
+- **Added User Profile Feature**: User management and goal tracking
+  - `UserProfileView.swift`: User profile display and editing
+  - `UserProfileModel.swift`: User data management
+  - `UserProfile.swift`: User data model
+
+- **Added New Models**: Data structures for exercises and goals
+  - `Exercise.swift`: Exercise data model
+  - `FitnessGoal.swift`: Fitness goals tracking
+  - `UserProfile.swift`: User profile information
+
+- **Added New Services**: Backend integrations
+  - `ExerciseAPIService.swift`: Exercise database API integration
+  - `LocalExerciseDatabase.swift`: Local exercise caching
+  - `SquatFormClassifier.swift`: ML-based form classification
+
+- **Updated Existing Features**: Enhanced core functionality
+  - Updated `FitnessDashboardModel.swift` and `FitnessDashboardView.swift`
+  - Enhanced `AppleHealthAgentModel.swift`
+  - Improved `HealthKitService.swift`
 
 
 ## Features
@@ -29,11 +59,23 @@ FitnessCoach is an iOS application that combines Apple HealthKit data with AI-po
 - **Multi-turn Conversations**: Maintain conversation history for better context
 - **Real-time Chat Interface**: Beautiful chat bubbles with role-based styling
 
-### 📊 Dashboard & Analytics
-- **Fitness Dashboard**: Comprehensive view of your fitness metrics
-- **Progress Tracking**: Visual ring indicators for goal progress
-- **Recommendation Cards**: Personalized workout and health recommendations
-- **Goal Editor**: Set and track custom fitness goals
+### 🎬 Movement Analysis & Form Correction
+- **Real-time Form Detection**: AI-powered pose detection for exercise form analysis
+- **Movement Camera Integration**: Live video capture with overlay feedback
+- **Squat Form Classification**: Specialized analysis for squat technique
+- **Visual Feedback**: On-screen corrections and form guidance
+
+### 💪 Workout Planning & Tracking
+- **Workout Planner**: Create and manage custom workout routines
+- **Active Workout Tracking**: Real-time exercise tracking with form monitoring
+- **Muscle Body Map**: Visual targeting of specific muscle groups
+- **Workout Reports**: Post-workout form analysis and recommendations
+- **Exercise Database**: Comprehensive local and API-based exercise library
+
+### 👤 User Profiles & Goals
+- **User Profiles**: Personalized user information and settings
+- **Fitness Goals**: Set and track multiple fitness objectives
+- **Goal Progress**: Visual indicators for goal achievement
 
 ## Project Structure
 
@@ -55,9 +97,27 @@ FitnessCoach/
 │   │   ├── MetricCardView.swift
 │   │   ├── ProgressRingView.swift
 │   │   └── RecommendationCardView.swift
-│   └── AppleHealthAgent/       # Health data agent
-│       ├── AppleHealthAgentView.swift
-│       └── AppleHealthAgentModel.swift
+│   ├── AppleHealthAgent/       # Health data agent
+│   │   ├── AppleHealthAgentView.swift
+│   │   └── AppleHealthAgentModel.swift
+│   ├── MoveCorrection/         # Exercise form analysis
+│   │   ├── MovementAnalysis.swift
+│   │   ├── MovementCameraSession.swift
+│   │   ├── MovementCameraPreview.swift
+│   │   ├── MovementOverlayView.swift
+│   │   └── SquatFormClassifier.swift
+│   ├── WorkoutPlanner/         # Workout planning and tracking
+│   │   ├── WorkoutPlannerView.swift
+│   │   ├── WorkoutPlannerModel.swift
+│   │   ├── ActiveWorkoutView.swift
+│   │   ├── CustomWorkoutBuilderView.swift
+│   │   ├── MuscleBodyMapView.swift
+│   │   ├── WorkoutFormReportView.swift
+│   │   ├── WorkoutPlanDetailView.swift
+│   │   └── WorkoutMovementTrackingModel.swift
+│   └── Profile/                # User profile management
+│       ├── UserProfileView.swift
+│       └── UserProfileModel.swift
 ├── Models/
 │   ├── A2AResponse.swift       # A2A JSON response models
 │   ├── AppTab.swift            # App navigation tabs
@@ -65,12 +125,18 @@ FitnessCoach/
 │   ├── ChatMessageRole.swift   # Message role enum
 │   ├── FitnessSnapshot.swift   # Health snapshot data
 │   ├── HealthAccessState.swift # HealthKit permission state
-│   └── WorkoutRecommendation.swift
+│   ├── WorkoutRecommendation.swift
+│   ├── Exercise.swift          # Exercise data model
+│   ├── FitnessGoal.swift       # Fitness goals model
+│   └── UserProfile.swift       # User profile model
 ├── Services/
 │   ├── AppleHealthAgent.swift  # Health data service
 │   ├── GroqChatService.swift   # AI chat service
 │   ├── HealthKitService.swift  # HealthKit integration
-│   └── WorkoutRecommendationEngine.swift
+│   ├── WorkoutRecommendationEngine.swift
+│   ├── ExerciseAPIService.swift      # Exercise API integration
+│   ├── LocalExerciseDatabase.swift   # Local exercise caching
+│   └── SquatFormClassifier.swift     # ML-based form analysis
 ├── ContentView.swift           # Main app view
 └── FitnessCoachApp.swift       # App entry point
 ```
@@ -209,12 +275,15 @@ HealthKit → HealthKitService → FitnessSnapshot
 
 ## Future Enhancements
 
-- [ ] Workout tracking and logging
+- [x] Workout tracking and logging *(added in 2026-05-28)*
+- [x] Exercise form correction and movement analysis *(added in 2026-05-28)*
 - [ ] Personalized meal recommendations
 - [ ] Social sharing and challenges
 - [ ] Advanced analytics and trends
 - [ ] Offline mode for health data
 - [ ] Custom A2A agent plugins
+- [ ] Integration with wearable devices beyond HealthKit
+- [ ] Video-based workout tutorials
 
 ## License
 
