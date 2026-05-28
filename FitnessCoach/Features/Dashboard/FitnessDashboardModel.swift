@@ -2,8 +2,6 @@
 //  FitnessDashboardModel.swift
 //  FitnessCoach
 //
-//  Created by Codex on 2026/5/7.
-//
 
 import Foundation
 import Combine
@@ -18,7 +16,6 @@ final class FitnessDashboardModel: ObservableObject {
     @Published var isLoading = false
     @Published var lastUpdated: Date?
     @Published var errorMessage: String?
-    @Published var isUsingMockHealthData = false
 
     @AppStorage("userFitnessGoalRaw") private var goalRaw: String = FitnessGoal.maintain.rawValue
 
@@ -54,7 +51,6 @@ final class FitnessDashboardModel: ObservableObject {
 
     func load(goal: Double) async {
         snapshot = snapshot.updatingGoal(goal)
-        isUsingMockHealthData = healthKitService.usesMockData
         refreshRecommendations()
 
         guard healthKitService.isAvailable else {
@@ -71,7 +67,6 @@ final class FitnessDashboardModel: ObservableObject {
 
     func requestHealthAccess() async {
         isLoading = true
-        isUsingMockHealthData = healthKitService.usesMockData
 
         do {
             try await healthKitService.requestAuthorization()
@@ -90,8 +85,6 @@ final class FitnessDashboardModel: ObservableObject {
     }
 
     func refresh() async {
-        isUsingMockHealthData = healthKitService.usesMockData
-
         guard healthKitService.isAvailable else {
             snapshot = snapshot.updatingActiveEnergy(0)
             healthAccessState = .notAvailable
@@ -114,7 +107,7 @@ final class FitnessDashboardModel: ObservableObject {
             snapshot = snapshot.updatingActiveEnergy(0)
             healthAccessState = .denied
             lastUpdated = nil
-            errorMessage = "I could not read today’s Active Energy. You can still plan workouts manually."
+            errorMessage = "I could not read today's Active Energy. You can still plan workouts manually."
         }
 
         refreshRecommendations()
@@ -136,7 +129,6 @@ final class FitnessDashboardModel: ObservableObject {
 
     private func applyCompletedWorkoutCalories(_ calories: Double) {
         guard calories > 0 else { return }
-
         snapshot = snapshot.updatingActiveEnergy(snapshot.activeEnergyBurned + calories)
         lastUpdated = .now
         errorMessage = nil

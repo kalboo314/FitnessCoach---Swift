@@ -2,16 +2,11 @@
 //  FitnessDashboardView.swift
 //  FitnessCoach
 //
-//  Created by Codex on 2026/5/7.
-//
 
 import SwiftUI
 
 struct FitnessDashboardView: View {
     @ObservedObject var model: FitnessDashboardModel
-    @Binding var dailyGoal: Double
-    @AppStorage(HealthKitService.mockDataDefaultsKey) private var useMockHealthData = false
-    @State private var isShowingGoalEditor = false
 
     var body: some View {
         ScrollView {
@@ -29,7 +24,7 @@ struct FitnessDashboardView: View {
                 VStack(alignment: .leading, spacing: AppTheme.cardSpacing) {
                     SummaryMetricRow(
                         title: "Daily Goal",
-                        value: "\(Int(dailyGoal.rounded())) kcal",
+                        value: "\(Int(model.snapshot.dailyGoal.rounded())) kcal",
                         systemImage: "target",
                         tint: .blue
                     )
@@ -115,7 +110,6 @@ struct FitnessDashboardView: View {
                 .clipShape(RoundedRectangle(cornerRadius: AppTheme.cornerRadius))
                 .shadow(color: AppTheme.shadow, radius: 18, y: 8)
 
-                // Workout planner entry card
                 NavigationLink(destination: WorkoutPlannerView()) {
                     VStack(alignment: .leading, spacing: 12) {
                         HStack {
@@ -127,7 +121,7 @@ struct FitnessDashboardView: View {
                                 .foregroundStyle(.purple.opacity(0.5))
                         }
 
-                        Text("Tell us how long you have and your intensity. We’ll build a personalised plan with real exercises and estimate your calorie burn.")
+                        Text("Tell us how long you have and your intensity. We'll build a personalised plan with real exercises and estimate your calorie burn.")
                             .font(.body)
                             .foregroundStyle(.secondary)
 
@@ -151,14 +145,13 @@ struct FitnessDashboardView: View {
                 }
                 .buttonStyle(.plain)
 
-                // AI coach entry card
                 NavigationLink(destination: CoachChatView(model: CoachChatModel(), snapshot: model.snapshot)) {
                     VStack(alignment: .leading, spacing: 10) {
                         Label("Recommendations", systemImage: "message.fill")
                             .font(.headline)
                             .foregroundStyle(.blue)
 
-                        Text("Open practical suggestions based on today’s progress.")
+                        Text("Open practical suggestions based on today's progress.")
                             .font(.body)
                             .foregroundStyle(.secondary)
 
@@ -173,152 +166,67 @@ struct FitnessDashboardView: View {
                     .shadow(color: AppTheme.shadow, radius: 18, y: 8)
                 }
                 .buttonStyle(.plain)
-
-                #if DEBUG
-                VStack(alignment: .leading, spacing: 10) {
-                    Text("Debug")
-                        .font(.headline)
-                        .bold()
-
-                    Toggle("Use Sample Health Data", isOn: $useMockHealthData)
-
-                    Text(debugMessage)
-                        .font(.footnote)
-                        .foregroundStyle(.secondary)
-                }
-                .padding(AppTheme.cardPadding)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .background(AppTheme.cardBackground)
-                .clipShape(RoundedRectangle(cornerRadius: AppTheme.cornerRadius))
-                .shadow(color: AppTheme.shadow, radius: 18, y: 8)
-                #endif
             }
             .padding(AppTheme.screenPadding)
         }
         .background(AppTheme.background.ignoresSafeArea())
         .navigationTitle("Fitness Coach")
-        .toolbar(content: {
-            ToolbarItem(placement: .navigationBarLeading) {
-                Button(action: openGoalEditor) {
-                    Label("Set Goal", systemImage: "slider.horizontal.3")
-                }
-            }
-        })
-        .sheet(isPresented: $isShowingGoalEditor) {
-            GoalEditorView(dailyGoal: $dailyGoal)
-        }
-        .onChange(of: useMockHealthData) { _ in
-            Task {
-                await model.load(goal: dailyGoal)
-            }
-        }
         .refreshable {
             await model.refresh()
         }
     }
 
     private var statusMessage: String? {
-        if let errorMessage = model.errorMessage {
-            return errorMessage
-        }
-
-        if model.isUsingMockHealthData {
-            return "Showing sample Apple Health data for testing."
-        }
-
+        if let errorMessage = model.errorMessage { return errorMessage }
         if let lastUpdated = model.lastUpdated {
             return "Updated \(lastUpdated.formatted(date: .omitted, time: .shortened))."
         }
-
-        return "Connect Apple Health when you want the screen to reflect today’s activity automatically."
+        return "Connect Apple Health when you want the screen to reflect today's activity automatically."
     }
-
-    #if DEBUG
-    private var debugMessage: String {
-        #if targetEnvironment(simulator)
-        if useMockHealthData {
-            return "Sample data is on. Turn it off to test the unavailable Apple Health state in Simulator."
-        }
-
-        return "Sample data is off. Apple Health remains unavailable in Simulator."
-        #else
-        if useMockHealthData {
-            return "Sample data is on. Turn it off to use live Apple Health on a physical iPhone."
-        }
-
-        return "Sample data is off. Live Apple Health is used when permission is available on a physical iPhone."
-        #endif
-    }
-    #endif
 
     private var healthConnectionTitle: String {
         switch model.healthAccessState {
-        case .unknown:
-            return "Checking"
-        case .authorized:
-            return "Connected"
-        case .denied:
-            return "Needs attention"
-        case .notAvailable:
-            return "Unavailable"
+        case .unknown: return "Checking"
+        case .authorized: return "Connected"
+        case .denied: return "Needs attention"
+        case .notAvailable: return "Unavailable"
         }
     }
 
     private var healthConnectionIcon: String {
         switch model.healthAccessState {
-        case .unknown:
-            return "hourglass"
-        case .authorized:
-            return "checkmark.circle.fill"
-        case .denied:
-            return "exclamationmark.circle"
-        case .notAvailable:
-            return "iphone.slash"
+        case .unknown: return "hourglass"
+        case .authorized: return "checkmark.circle.fill"
+        case .denied: return "exclamationmark.circle"
+        case .notAvailable: return "iphone.slash"
         }
     }
 
     private var healthConnectionTint: Color {
         switch model.healthAccessState {
-        case .unknown:
-            return .orange
-        case .authorized:
-            return .green
-        case .denied:
-            return .orange
-        case .notAvailable:
-            return .gray
+        case .unknown: return .orange
+        case .authorized: return .green
+        case .denied: return .orange
+        case .notAvailable: return .gray
         }
     }
 
     private var mealRecommendationTint: Color {
         switch model.mealRecommendation.tintName {
-        case "green":
-            return .green
-        case "orange":
-            return .orange
-        case "blue":
-            return .blue
-        case "yellow":
-            return .yellow
-        default:
-            return .teal
+        case "green": return .green
+        case "orange": return .orange
+        case "blue": return .blue
+        case "yellow": return .yellow
+        default: return .teal
         }
-    }
-
-    private func openGoalEditor() {
-        isShowingGoalEditor = true
     }
 
     private func refreshDashboard() {
-        Task {
-            await model.refresh()
-        }
+        Task { await model.refresh() }
     }
 
     private func handleHealthAccess() {
-        Task {
-            await model.requestHealthAccess()
-        }
+        Task { await model.requestHealthAccess() }
     }
 }
 
@@ -350,10 +258,7 @@ private struct SummaryMetricRow: View {
 struct FitnessDashboardView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationStack {
-            FitnessDashboardView(
-                model: FitnessDashboardModel(),
-                dailyGoal: .constant(650)
-            )
+            FitnessDashboardView(model: FitnessDashboardModel())
         }
     }
 }

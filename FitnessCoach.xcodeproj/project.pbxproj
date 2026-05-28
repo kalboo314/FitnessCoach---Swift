@@ -50,6 +50,8 @@
 		C0010001000000000000002C /* UserProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0010000000000000000002C /* UserProfileView.swift */; };
 		C0010001000000000000002E /* Exercise.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0010000000000000000002E /* Exercise.swift */; };
 		C0010001000000000000002F /* ExerciseAPIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0010000000000000000002F /* ExerciseAPIService.swift */; };
+		C001000100000000000000A0 /* LocalExerciseDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = C001000000000000000000A0 /* LocalExerciseDatabase.swift */; };
+		C001000100000000000000A1 /* SquatFormClassifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = C001000000000000000000A1 /* SquatFormClassifier.swift */; };
 		C00100010000000000000030 /* WorkoutPlannerModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00100000000000000000030 /* WorkoutPlannerModel.swift */; };
 		C00100010000000000000031 /* WorkoutPlannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00100000000000000000031 /* WorkoutPlannerView.swift */; };
 		C00100010000000000000032 /* WorkoutPlanDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00100000000000000000032 /* WorkoutPlanDetailView.swift */; };
@@ -59,6 +61,9 @@
 		C00100010000000000000037 /* MovementCameraPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00100000000000000000037 /* MovementCameraPreview.swift */; };
 		C00100010000000000000038 /* MovementOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00100000000000000000038 /* MovementOverlayView.swift */; };
 		C00100010000000000000039 /* WorkoutMovementTrackingModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00100000000000000000039 /* WorkoutMovementTrackingModel.swift */; };
+		C0010001000000000000003A /* CustomWorkoutBuilderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0010000000000000000003A /* CustomWorkoutBuilderView.swift */; };
+		C001000100000000000000B0 /* MuscleBodyMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C001000000000000000000B0 /* MuscleBodyMapView.swift */; };
+		C001000100000000000000B1 /* WorkoutFormReportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C001000000000000000000B1 /* WorkoutFormReportView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -126,6 +131,8 @@
 		C0010000000000000000002C /* UserProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfileView.swift; sourceTree = "<group>"; };
 		C0010000000000000000002E /* Exercise.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Exercise.swift; sourceTree = "<group>"; };
 		C0010000000000000000002F /* ExerciseAPIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseAPIService.swift; sourceTree = "<group>"; };
+		C001000000000000000000A0 /* LocalExerciseDatabase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalExerciseDatabase.swift; sourceTree = "<group>"; };
+		C001000000000000000000A1 /* SquatFormClassifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SquatFormClassifier.swift; sourceTree = "<group>"; };
 		C00100000000000000000030 /* WorkoutPlannerModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutPlannerModel.swift; sourceTree = "<group>"; };
 		C00100000000000000000031 /* WorkoutPlannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutPlannerView.swift; sourceTree = "<group>"; };
 		C00100000000000000000032 /* WorkoutPlanDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutPlanDetailView.swift; sourceTree = "<group>"; };
@@ -135,6 +142,9 @@
 		C00100000000000000000037 /* MovementCameraPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovementCameraPreview.swift; sourceTree = "<group>"; };
 		C00100000000000000000038 /* MovementOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovementOverlayView.swift; sourceTree = "<group>"; };
 		C00100000000000000000039 /* WorkoutMovementTrackingModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutMovementTrackingModel.swift; sourceTree = "<group>"; };
+		C0010000000000000000003A /* CustomWorkoutBuilderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomWorkoutBuilderView.swift; sourceTree = "<group>"; };
+		C001000000000000000000B0 /* MuscleBodyMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MuscleBodyMapView.swift; sourceTree = "<group>"; };
+		C001000000000000000000B1 /* WorkoutFormReportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutFormReportView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -253,6 +263,8 @@
 			children = (
 				C00100000000000000000021 /* AppleHealthAgent.swift */,
 				C0010000000000000000002F /* ExerciseAPIService.swift */,
+				C001000000000000000000A0 /* LocalExerciseDatabase.swift */,
+				C001000000000000000000A1 /* SquatFormClassifier.swift */,
 				C00100000000000000000018 /* GroqChatService.swift */,
 				C0010000000000000000001F /* GroqVisionService.swift */,
 				C00100000000000000000006 /* HealthKitService.swift */,
@@ -282,6 +294,9 @@
 				C00100000000000000000032 /* WorkoutPlanDetailView.swift */,
 				C00100000000000000000033 /* ActiveWorkoutView.swift */,
 				C00100000000000000000039 /* WorkoutMovementTrackingModel.swift */,
+				C0010000000000000000003A /* CustomWorkoutBuilderView.swift */,
+				C001000000000000000000B0 /* MuscleBodyMapView.swift */,
+				C001000000000000000000B1 /* WorkoutFormReportView.swift */,
 			);
 			path = WorkoutPlanner;
 			sourceTree = "<group>";
@@ -516,11 +531,16 @@
 				C0010001000000000000002C /* UserProfileView.swift in Sources */,
 				C0010001000000000000002E /* Exercise.swift in Sources */,
 				C0010001000000000000002F /* ExerciseAPIService.swift in Sources */,
+				C001000100000000000000A0 /* LocalExerciseDatabase.swift in Sources */,
+				C001000100000000000000A1 /* SquatFormClassifier.swift in Sources */,
 				C00100010000000000000030 /* WorkoutPlannerModel.swift in Sources */,
 				C00100010000000000000031 /* WorkoutPlannerView.swift in Sources */,
 				C00100010000000000000032 /* WorkoutPlanDetailView.swift in Sources */,
 				C00100010000000000000033 /* ActiveWorkoutView.swift in Sources */,
 				C00100010000000000000039 /* WorkoutMovementTrackingModel.swift in Sources */,
+				C0010001000000000000003A /* CustomWorkoutBuilderView.swift in Sources */,
+				C001000100000000000000B0 /* MuscleBodyMapView.swift in Sources */,
+				C001000100000000000000B1 /* WorkoutFormReportView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -25,7 +25,7 @@ struct ContentView: View {
     var body: some View {
         TabView(selection: $selectedTab) {
             NavigationStack {
-                FitnessDashboardView(model: model, dailyGoal: $dailyCalorieGoal)
+                FitnessDashboardView(model: model)
             }
             .tabItem {
                 Label("Dashboard", systemImage: "figure.walk")
@@ -60,7 +60,7 @@ struct ContentView: View {
             .tag(AppTab.profile)
         }
         .preferredColorScheme(preferredColorScheme)
-        .task(loadDashboard)
+        .task { await model.load(goal: dailyCalorieGoal) }
         .onChange(of: dailyCalorieGoal) { newValue in
             Task {
                 await model.updateGoal(newValue)
@@ -68,9 +68,7 @@ struct ContentView: View {
         }
     }
 
-    private func loadDashboard() async {
-        await model.load(goal: dailyCalorieGoal)
-    }
+
 }
 
 struct ContentView_Previews: PreviewProvider {

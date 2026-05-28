@@ -72,8 +72,9 @@ final class AppleHealthAgentModel: ObservableObject {
     }
 
     func loadData(dailyGoal: Double) async {
-        if healthKitService.usesMockData || !healthKitService.isAvailable {
-            loadMockData(dailyGoal: dailyGoal)
+        guard healthKitService.isAvailable else {
+            healthAccessState = .notAvailable
+            error = "Apple Health is not available on this device."
             return
         }
 
