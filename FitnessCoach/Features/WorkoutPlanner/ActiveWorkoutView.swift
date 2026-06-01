@@ -16,6 +16,7 @@ struct ActiveWorkoutView: View {
     init(plan: WorkoutPlan) {
         _model = StateObject(wrappedValue: ActiveWorkoutModel(plan: plan))
     }
+    
 
     var body: some View {
         ZStack {
@@ -165,7 +166,7 @@ struct ActiveWorkoutView: View {
             ZStack(alignment: .topTrailing) {
                 RoundedRectangle(cornerRadius: AppTheme.cornerRadius)
                     .fill(Color.black.opacity(0.9))
-                    .frame(height: 260)
+                    .frame(height: 320)
                     .overlay {
                         if movementTracker.isCameraAuthorized {
                             ZStack {

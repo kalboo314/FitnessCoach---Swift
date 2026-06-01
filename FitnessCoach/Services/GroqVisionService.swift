@@ -44,8 +44,8 @@ struct GroqVisionService {
             "temperature": 0.5,
             "max_tokens": 1024,
             "messages": [
-                ["role": "system", "content": systemPrompt],
-                ["role": "user", "content": userContent]
+                ["role": "system", "content": systemPrompt] as [String: Any],
+                ["role": "user", "content": userContent] as [String: Any]
             ]
         ]
 

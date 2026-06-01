@@ -133,7 +133,8 @@ final class MoveCorrectionModel: ObservableObject {
             }
 
             let poseRequest = VNDetectHumanBodyPoseRequest()
-            let handler = VNImageRequestHandler(cmSampleBuffer: sampleBuffer, orientation: .leftMirrored)
+            // Buffer is already portrait + mirrored (set on the capture connection)
+            let handler = VNImageRequestHandler(cmSampleBuffer: sampleBuffer, orientation: .upMirrored)
 
             do {
                 try handler.perform([poseRequest])

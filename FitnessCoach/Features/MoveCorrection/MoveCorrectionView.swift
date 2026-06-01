@@ -14,62 +14,18 @@ struct MoveCorrectionView: View {
     @State private var isShowingAPIKeySheet = false
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: AppTheme.largeSpacing) {
-                introCard
-
-                modePicker
-
-                if groqApiKey.isEmpty {
-                    HealthStatusCardView(
-                        state: .unknown,
-                        message: "Add your Groq API key to enable AI form analysis.",
-                        actionTitle: "Add Groq Key",
-                        action: { isShowingAPIKeySheet = true }
-                    )
-                }
-
-                if model.selectedMode == .live {
-                    liveTrackingCard
-                } else {
-                    photoSourceButtons
-
-                    if let image = model.selectedImage {
-                        selectedImageCard(image: image)
-                    }
-                }
-
-                if let errorMessage = model.errorMessage {
-                    Text(errorMessage)
-                        .font(.subheadline)
-                        .foregroundStyle(.red)
-                        .padding(AppTheme.cardPadding)
-                        .background(Color.white.opacity(0.88))
-                        .clipShape(RoundedRectangle(cornerRadius: AppTheme.cornerRadius))
-                }
-
-                if let result = model.analysisResult {
-                    analysisCard(result: result)
-                }
-
-                if model.isAnalyzing {
-                    ProgressView("Coach is analysing your form...")
-                        .frame(maxWidth: .infinity, alignment: .center)
-                        .padding()
-                }
+        Group {
+            if model.selectedMode == .live {
+                liveFullScreenView
+            } else {
+                photoScrollView
             }
-            .padding(AppTheme.screenPadding)
         }
         .background(AppTheme.background.ignoresSafeArea())
         .navigationTitle("Fix My Move")
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
                 Button("Groq Key") { isShowingAPIKeySheet = true }
-            }
-            if model.selectedMode == .photo, model.selectedImage != nil {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Clear") { model.clearImage() }
-                }
             }
         }
         .task {
@@ -102,6 +58,120 @@ struct MoveCorrectionView: View {
         }
     }
 
+    // MARK: - Full-screen live view
+
+    private var liveFullScreenView: some View {
+        ZStack {
+            // Camera fills the entire screen
+            Group {
+                if model.isCameraAuthorized {
+                    ZStack {
+                        MovementCameraPreview(session: model.cameraSession.session)
+                        MovementOverlayView(points: model.skeletonPoints)
+                    }
+                } else {
+                    Color.black
+                        .overlay(permissionPlaceholder)
+                }
+            }
+            .ignoresSafeArea()
+
+            // Controls overlaid on top
+            VStack(spacing: 0) {
+                // Top bar — mode picker + exercise picker
+                VStack(spacing: 10) {
+                    modePicker
+
+                    exercisePicker
+                        .padding(.horizontal, 4)
+                }
+                .padding(.horizontal, AppTheme.screenPadding)
+                .padding(.top, 12)
+                .padding(.bottom, 14)
+                .background(.ultraThinMaterial)
+
+                Spacer()
+
+                // Rep counter badge (top-right corner of camera area)
+                HStack {
+                    Spacer()
+                    repBadge
+                        .padding(.trailing, AppTheme.screenPadding)
+                        .padding(.bottom, 8)
+                }
+
+                // Bottom panel — stats, feedback, reset
+                VStack(spacing: 12) {
+                    statsRow
+
+                    formFeedbackBanner(model.liveFormCategory, text: model.liveFeedback)
+
+                    HStack(spacing: 12) {
+                        Text(model.selectedExercise.setupHint)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+
+                        Button(action: { model.resetLiveSession() }) {
+                            Label("Reset", systemImage: "arrow.counterclockwise")
+                                .font(.subheadline.weight(.semibold))
+                        }
+                        .buttonStyle(.bordered)
+                    }
+                }
+                .padding(AppTheme.cardPadding)
+                .background(.ultraThinMaterial)
+            }
+        }
+    }
+
+    // MARK: - Photo mode scroll view
+
+    private var photoScrollView: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: AppTheme.largeSpacing) {
+                introCard
+
+                modePicker
+
+                if groqApiKey.isEmpty {
+                    HealthStatusCardView(
+                        state: .unknown,
+                        message: "Add your Groq API key to enable AI form analysis.",
+                        actionTitle: "Add Groq Key",
+                        action: { isShowingAPIKeySheet = true }
+                    )
+                }
+
+                photoSourceButtons
+
+                if let image = model.selectedImage {
+                    selectedImageCard(image: image)
+                }
+
+                if let errorMessage = model.errorMessage {
+                    Text(errorMessage)
+                        .font(.subheadline)
+                        .foregroundStyle(.red)
+                        .padding(AppTheme.cardPadding)
+                        .background(Color.white.opacity(0.88))
+                        .clipShape(RoundedRectangle(cornerRadius: AppTheme.cornerRadius))
+                }
+
+                if let result = model.analysisResult {
+                    analysisCard(result: result)
+                }
+
+                if model.isAnalyzing {
+                    ProgressView("Coach is analysing your form...")
+                        .frame(maxWidth: .infinity, alignment: .center)
+                        .padding()
+                }
+            }
+            .padding(AppTheme.screenPadding)
+        }
+    }
+
     private var introCard: some View {
         VStack(alignment: .leading, spacing: 10) {
             Label("AI Form Coach", systemImage: "camera.viewfinder")
@@ -126,51 +196,6 @@ struct MoveCorrectionView: View {
             }
         }
         .pickerStyle(.segmented)
-    }
-
-    private var liveTrackingCard: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            exercisePicker
-
-            ZStack(alignment: .topTrailing) {
-                RoundedRectangle(cornerRadius: 24)
-                    .fill(Color.black.opacity(0.9))
-                    .frame(height: 360)
-                    .overlay {
-                        if model.isCameraAuthorized {
-                            ZStack {
-                                MovementCameraPreview(session: model.cameraSession.session)
-                                MovementOverlayView(points: model.skeletonPoints)
-                            }
-                            .clipShape(RoundedRectangle(cornerRadius: 24))
-                        } else {
-                            permissionPlaceholder
-                        }
-                    }
-
-                repBadge
-                    .padding(16)
-            }
-
-            statsRow
-
-            formFeedbackBanner(model.liveFormCategory, text: model.liveFeedback)
-
-            Text(model.selectedExercise.setupHint)
-                .font(.footnote)
-                .foregroundStyle(.secondary)
-
-            Button(action: model.resetLiveSession) {
-                Label("Reset Counter", systemImage: "arrow.counterclockwise")
-                    .frame(maxWidth: .infinity)
-            }
-            .buttonStyle(.bordered)
-        }
-        .padding(AppTheme.cardPadding)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(AppTheme.cardBackground)
-        .clipShape(RoundedRectangle(cornerRadius: AppTheme.cornerRadius))
-        .shadow(color: AppTheme.shadow, radius: 18, y: 8)
     }
 
     private var photoSourceButtons: some View {
