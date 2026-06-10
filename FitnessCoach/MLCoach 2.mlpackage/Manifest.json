@@ -1,0 +1,24 @@
+{
+    "fileFormatVersion": "1.0.0",
+    "itemInfoEntries": {
+        "34872130-57C0-4D95-B46D-73FBD7B6420C": {
+            "author": "com.apple.CoreML",
+            "description": "External Metadata Overlay",
+            "name": "Metadata.json",
+            "path": "com.apple.CoreML/Metadata.json"
+        },
+        "42098CA1-3E2F-4803-95E5-E3894A7631A2": {
+            "author": "com.apple.CoreML",
+            "description": "CoreML Model Specification",
+            "name": "MLCoach 2.mlmodel",
+            "path": "com.apple.CoreML/MLCoach 2.mlmodel"
+        },
+        "A0AA9499-9100-4555-B581-901D879D5A5E": {
+            "author": "com.apple.CoreML",
+            "description": "External FeatureDescription Overlay",
+            "name": "FeatureDescriptions.json",
+            "path": "com.apple.CoreML/FeatureDescriptions.json"
+        }
+    },
+    "rootModelIdentifier": "42098CA1-3E2F-4803-95E5-E3894A7631A2"
+}
