@@ -41,8 +41,11 @@ final class MoveCorrectionModel: ObservableObject {
     private let visionService = GroqVisionService()
     let cameraSession = MovementCameraSession()
     private let analyzer = MovementAnalyzer()
+    private let mlCoachClassifier = MLCoachActionClassifier.shared
     private let visionQueue = DispatchQueue(label: "fitnesscoach.pose.analysis")
     private var isProcessingFrame = false
+    private var lowestAngleThisRep: Double?
+    private var deepestTemporalCategory: FormFeedbackCategory?
 
     init() {
         cameraSession.onSampleBuffer = { [weak self] sampleBuffer in
@@ -84,6 +87,9 @@ final class MoveCorrectionModel: ObservableObject {
         skeletonPoints = []
         errorMessage = nil
         liveFormCategory = nil
+        lowestAngleThisRep = nil
+        deepestTemporalCategory = nil
+        mlCoachClassifier.reset()
     }
 
     func startCamera() {
@@ -122,6 +128,8 @@ final class MoveCorrectionModel: ObservableObject {
         let currentStage = trackingStage
         let currentCount = repCount
         let analyzer = self.analyzer
+        let mlCoach  = self.mlCoachClassifier
+        let isSquat  = exercise == .squat
 
         visionQueue.async { [weak self] in
             guard let self else { return }
@@ -147,6 +155,12 @@ final class MoveCorrectionModel: ObservableObject {
                     return
                 }
 
+                // Temporal classification via MLCoach 2 (squats only).
+                // Returns nil during the 60-frame warmup or when model unavailable.
+                let temporalCategory: FormFeedbackCategory? = isSquat
+                    ? mlCoach.feed(observation: observation)
+                    : nil
+
                 let analysis = analyzer.analyze(
                     observation: observation,
                     exercise: exercise,
@@ -155,12 +169,33 @@ final class MoveCorrectionModel: ObservableObject {
                 )
 
                 Task { @MainActor in
-                    self.repCount = analysis.repCount
+                    if analysis.repCount > self.repCount {
+                        // Use the form at the deepest point of the rep.
+                        let formAtBottom = self.deepestTemporalCategory
+                            ?? temporalCategory ?? analysis.formCategory
+                        // Only count the rep if form is correct (squats only).
+                        if exercise != .squat || formAtBottom == .squatCorrect {
+                            self.repCount = analysis.repCount
+                        }
+                        self.lowestAngleThisRep = nil
+                        self.deepestTemporalCategory = nil
+                    }
+                    // Track deepest angle and temporal category during the lowered phase.
+                    if analysis.stage == .lowered, let angle = analysis.angle {
+                        if angle < (self.lowestAngleThisRep ?? .infinity) {
+                            self.lowestAngleThisRep = angle
+                            if let tc = temporalCategory {
+                                self.deepestTemporalCategory = tc
+                            }
+                        }
+                    }
                     self.trackingStage = analysis.stage
-                    self.liveFeedback = analysis.feedback
                     self.measuredAngle = analysis.angle
                     self.skeletonPoints = analysis.skeleton
-                    self.liveFormCategory = analysis.formCategory
+                    self.liveFormCategory = temporalCategory ?? analysis.formCategory
+                    self.liveFeedback = isSquat
+                        ? (self.liveFormCategory ?? .none).feedbackText
+                        : analysis.feedback
                 }
             } catch {
                 Task { @MainActor in

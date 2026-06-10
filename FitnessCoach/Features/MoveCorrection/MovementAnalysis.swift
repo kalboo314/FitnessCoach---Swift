@@ -121,12 +121,12 @@ enum TrackedExercise: String, CaseIterable, Identifiable {
         }
     }
 
-    // Squats delegate to SquatFormClassifier (CoreML → rule fallback).
-    // All other exercises use simple angle threshold logic.
+    // Squats use angle-based rules as a warmup fallback (MLCoach 2 takes over once its
+    // 60-frame buffer is full). All other exercises use simple angle threshold logic.
     func classifyRep(lowestAngle: Double?, squatFeatures: SquatFeatures? = nil) -> FormFeedbackCategory {
         guard let angle = lowestAngle else { return .none }
         if self == .squat, let features = squatFeatures {
-            return SquatFormClassifier.shared.classify(features: features)
+            return squatAngleClassify(features)
         }
         return angle <= config.downAngle ? .squatCorrect : .squatTooShallow
     }
@@ -257,7 +257,7 @@ struct MovementAnalyzer {
             let torsoLean = torsoLeanAngle(points: points) ?? 0.0
             let features  = SquatFeatures(kneeAngle: angle, torsoLeanAngle: torsoLean)
             squatFeatures = features
-            liveCategory  = SquatFormClassifier.shared.classify(features: features)
+            liveCategory  = squatAngleClassify(features)
         } else {
             squatFeatures = nil
             liveCategory  = nil
@@ -401,4 +401,15 @@ struct MovementAnalyzer {
         guard mag > 0 else { return 180 }
         return acos(max(-1.0, min(1.0, dot / mag))) * 180 / Double.pi
     }
+}
+
+// Angle-based squat classification used as a warmup fallback while
+// MLCoach 2's 60-frame buffer fills up. Mirrors the thresholds the
+// model was trained against.
+private func squatAngleClassify(_ features: SquatFeatures) -> FormFeedbackCategory {
+    if features.torsoLeanAngle > 70 { return .other }
+    if features.kneeAngle > 155     { return .none }
+    if features.kneeAngle > 95      { return .squatTooShallow }
+    if features.torsoLeanAngle > 30 { return .squatTorsoLean }
+    return .squatCorrect
 }

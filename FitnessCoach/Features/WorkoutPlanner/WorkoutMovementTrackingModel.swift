@@ -177,7 +177,7 @@ final class WorkoutMovementTrackingModel: ObservableObject {
                                 squatFeatures: self.currentSquatFeatures
                             )
                         let record = RepFormRecord(
-                            repNumber: analysis.repCount,
+                            repNumber: self.formRecords.count + 1,
                             exerciseName: exerciseName,
                             trackedExercise: trackedExercise,
                             category: category,
@@ -188,6 +188,12 @@ final class WorkoutMovementTrackingModel: ObservableObject {
                         self.currentSquatFeatures = nil
                         self.currentTemporalCategory = nil
                         self.speakRepFeedback(category: category)
+                        // Only count the rep when form is correct.
+                        // For squats, wrong form (too shallow, torso lean, other)
+                        // means the rep is not counted — the user must redo it.
+                        if trackedExercise != .squat || category == .squatCorrect {
+                            self.repCount = analysis.repCount
+                        }
                     }
                     // Track deepest point during the lowered phase.
                     if analysis.stage == .lowered, let angle = analysis.angle {
@@ -200,7 +206,6 @@ final class WorkoutMovementTrackingModel: ObservableObject {
                             }
                         }
                     }
-                    self.repCount = analysis.repCount
                     self.trackingStage = analysis.stage
                     self.skeletonPoints = analysis.skeleton
                     self.measuredAngle = analysis.angle
