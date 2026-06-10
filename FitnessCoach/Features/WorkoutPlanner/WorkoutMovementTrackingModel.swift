@@ -23,10 +23,13 @@ final class WorkoutMovementTrackingModel: ObservableObject {
     let cameraSession = MovementCameraSession()
 
     private let analyzer = MovementAnalyzer()
+    private let mlCoachClassifier = MLCoachActionClassifier.shared
     private let visionQueue = DispatchQueue(label: "fitnesscoach.workout.pose.analysis")
+    private let speechSynthesizer = AVSpeechSynthesizer()
     private var isProcessingFrame = false
     private var lowestAngleThisRep: Double?
     private var currentSquatFeatures: SquatFeatures?   // squat features at the deepest point this rep
+    private var currentTemporalCategory: FormFeedbackCategory?  // MLCoach 2 result at deepest point
     private var currentExerciseName = ""
 
     var isTrackingAvailable: Bool {
@@ -88,7 +91,9 @@ final class WorkoutMovementTrackingModel: ObservableObject {
         trackingStage = .ready
         lowestAngleThisRep = nil
         currentSquatFeatures = nil
+        currentTemporalCategory = nil
         liveFormCategory = nil
+        mlCoachClassifier.reset()
     }
 
     func startTrackingIfPossible() {
@@ -100,13 +105,29 @@ final class WorkoutMovementTrackingModel: ObservableObject {
         cameraSession.stop()
     }
 
+    private func speakRepFeedback(category: FormFeedbackCategory) {
+        guard let cue = category.voiceCue else { return }
+        // Activate audio session so speech is audible even when other audio is playing.
+        try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .spokenAudio, options: [.duckOthers, .mixWithOthers])
+        try? AVAudioSession.sharedInstance().setActive(true)
+        let phrase = cue
+        let utterance = AVSpeechUtterance(string: phrase)
+        utterance.rate = 0.52
+        utterance.pitchMultiplier = 1.0
+        utterance.volume = 0.9
+        speechSynthesizer.stopSpeaking(at: .immediate)
+        speechSynthesizer.speak(utterance)
+    }
+
     private func processFrame(_ sampleBuffer: CMSampleBuffer) {
         guard !isProcessingFrame, isCameraAuthorized, let trackedExercise else { return }
         isProcessingFrame = true
         let analyzer = self.analyzer
+        let mlCoach  = self.mlCoachClassifier
         let currentStage = trackingStage
         let currentCount = repCount
         let exerciseName = currentExerciseName
+        let isSquat = trackedExercise == .squat
 
         visionQueue.async { [weak self] in
             guard let self else { return }
@@ -132,6 +153,12 @@ final class WorkoutMovementTrackingModel: ObservableObject {
                     return
                 }
 
+                // Temporal classification via MLCoach 2 (squats only).
+                // Returns nil during the 60-frame warmup or when model unavailable.
+                let temporalCategory: FormFeedbackCategory? = isSquat
+                    ? mlCoach.feed(observation: observation)
+                    : nil
+
                 let analysis = analyzer.analyze(
                     observation: observation,
                     exercise: trackedExercise,
@@ -142,34 +169,49 @@ final class WorkoutMovementTrackingModel: ObservableObject {
                 Task { @MainActor in
                     // Record rep form when a rep completes
                     if analysis.repCount > self.repCount {
+                        // Prefer temporal result captured at the deepest point;
+                        // fall back to angle-based classification.
+                        let category = self.currentTemporalCategory
+                            ?? trackedExercise.classifyRep(
+                                lowestAngle: self.lowestAngleThisRep,
+                                squatFeatures: self.currentSquatFeatures
+                            )
                         let record = RepFormRecord(
                             repNumber: analysis.repCount,
                             exerciseName: exerciseName,
                             trackedExercise: trackedExercise,
-                            category: trackedExercise.classifyRep(
-                                lowestAngle: self.lowestAngleThisRep,
-                                squatFeatures: self.currentSquatFeatures
-                            ),
+                            category: category,
                             angle: self.lowestAngleThisRep
                         )
                         self.formRecords.append(record)
                         self.lowestAngleThisRep = nil
                         self.currentSquatFeatures = nil
+                        self.currentTemporalCategory = nil
+                        self.speakRepFeedback(category: category)
                     }
-                    // Track deepest point during the lowered phase;
-                    // also capture squat features at that moment for CoreML input
+                    // Track deepest point during the lowered phase.
                     if analysis.stage == .lowered, let angle = analysis.angle {
                         if angle < (self.lowestAngleThisRep ?? .infinity) {
                             self.lowestAngleThisRep = angle
                             self.currentSquatFeatures = analysis.squatFeatures
+                            // Snapshot the temporal classification at the deepest point.
+                            if let tc = temporalCategory {
+                                self.currentTemporalCategory = tc
+                            }
                         }
                     }
                     self.repCount = analysis.repCount
                     self.trackingStage = analysis.stage
-                    self.feedback = analysis.feedback
-                    self.measuredAngle = analysis.angle
                     self.skeletonPoints = analysis.skeleton
-                    self.liveFormCategory = analysis.formCategory
+                    self.measuredAngle = analysis.angle
+                    // Live form indicator: temporal model wins when available;
+                    // angle-based result used during the warmup period.
+                    self.liveFormCategory = temporalCategory ?? analysis.formCategory
+                    // For squats use the category's text so it matches the temporal result;
+                    // for other exercises keep the richer angle-based feedback from the analyzer.
+                    self.feedback = isSquat
+                        ? (self.liveFormCategory ?? .none).feedbackText
+                        : analysis.feedback
                 }
             } catch {
                 Task { @MainActor in

@@ -10,55 +10,65 @@ import Vision
 // MARK: - Form tracking types
 
 enum FormFeedbackCategory: String, Hashable {
-    case goodForm        = "Good Form"
-    case rangeIncomplete = "Range Incomplete"
-    case kneeAlignment   = "Knee Alignment"
-    case bodyNotVisible  = "Body Not Visible"
-    case lowConfidence   = "Low Confidence"
+    case squatCorrect   = "Squat Correct"
+    case squatTooShallow = "Squat Too Shallow"
+    case squatTorsoLean  = "Squat Torso Lean"
+    case other           = "Other"
+    case none            = "None"
 
     var color: Color {
         switch self {
-        case .goodForm:        return .green
-        case .rangeIncomplete: return .orange
-        case .kneeAlignment:   return .yellow
-        case .bodyNotVisible:  return .gray
-        case .lowConfidence:   return Color(UIColor.systemGray3)
+        case .squatCorrect:    return .green
+        case .squatTooShallow: return .orange
+        case .squatTorsoLean:  return .yellow
+        case .other:           return .purple
+        case .none:            return Color(UIColor.systemGray3)
         }
     }
 
     var systemImage: String {
         switch self {
-        case .goodForm:        return "checkmark.circle.fill"
-        case .rangeIncomplete: return "arrow.down.circle.fill"
-        case .kneeAlignment:   return "exclamationmark.triangle.fill"
-        case .bodyNotVisible:  return "eye.slash.fill"
-        case .lowConfidence:   return "questionmark.circle.fill"
+        case .squatCorrect:    return "checkmark.circle.fill"
+        case .squatTooShallow: return "arrow.down.circle.fill"
+        case .squatTorsoLean:  return "exclamationmark.triangle.fill"
+        case .other:           return "questionmark.circle.fill"
+        case .none:            return "eye.slash.fill"
         }
     }
 
     // Human-readable sentence shown live on screen.
-    // CoreML classification → this text → user reads it.
     var feedbackText: String {
         switch self {
-        case .goodForm:
+        case .squatCorrect:
             return "Good form — drive back up with control."
-        case .rangeIncomplete:
+        case .squatTooShallow:
             return "Squat not low enough — sink your hips below your knees."
-        case .kneeAlignment:
-            return "Knees caving in — push them out over your toes."
-        case .bodyNotVisible:
-            return "Camera not low enough — point it down so your knees and ankles are visible."
-        case .lowConfidence:
-            return "Pose unclear — improve lighting or step further into frame."
+        case .squatTorsoLean:
+            return "Chest dropping — keep your torso upright and core braced."
+        case .other:
+            return "That doesn't look like a squat — adjust your position."
+        case .none:
+            return "Get into position — keep your full body in frame."
+        }
+    }
+
+    // Short spoken cue said aloud after each rep is completed.
+    // Returns nil for .none since no rep is counted for that state.
+    var voiceCue: String? {
+        switch self {
+        case .squatCorrect:    return "Great rep! Perfect form, keep it up."
+        case .squatTooShallow: return "Too shallow. Next rep, drive your hips lower until they're below your knees."
+        case .squatTorsoLean:  return "Chest caving forward. Brace your core and keep your torso tall."
+        case .other:           return "That didn't look like a squat. Reset your position and try again."
+        case .none:            return nil
         }
     }
 }
 
 // Features extracted from Vision joints for squat classification.
-// These are the two inputs to SquatFormClassifier (CoreML or rule-based).
 struct SquatFeatures {
-    let kneeAngle: Double           // avg hip-knee-ankle angle in degrees — lower = deeper
-    let kneeAlignmentRatio: Double  // knee_width / ankle_width — < 0.75 = valgus
+    let kneeAngle: Double        // avg hip-knee-ankle angle in degrees — lower = deeper
+    let torsoLeanAngle: Double   // angle of shoulder-to-hip line from vertical — higher = more forward lean
 }
 
 struct RepFormRecord: Identifiable {
@@ -114,11 +124,11 @@ enum TrackedExercise: String, CaseIterable, Identifiable {
     // Squats delegate to SquatFormClassifier (CoreML → rule fallback).
     // All other exercises use simple angle threshold logic.
     func classifyRep(lowestAngle: Double?, squatFeatures: SquatFeatures? = nil) -> FormFeedbackCategory {
-        guard let angle = lowestAngle else { return .bodyNotVisible }
+        guard let angle = lowestAngle else { return .none }
         if self == .squat, let features = squatFeatures {
             return SquatFormClassifier.shared.classify(features: features)
         }
-        return angle <= config.downAngle ? .goodForm : .rangeIncomplete
+        return angle <= config.downAngle ? .squatCorrect : .squatTooShallow
     }
 
     fileprivate var config: ExerciseTrackingConfiguration {
@@ -204,14 +214,14 @@ struct MovementAnalyzer {
         let skeleton = makeSkeleton(from: observation)
         let points   = (try? observation.recognizedPoints(.all)) ?? [:]
 
-        // Low overall confidence → surface as distinct state
+        // Low overall confidence → surface as none state
         let allConf = points.values.map(\.confidence)
         let avgConf = allConf.isEmpty ? Float(0) : allConf.reduce(0, +) / Float(allConf.count)
         guard avgConf >= 0.15 else {
             return result(repCount: currentCount, stage: currentStage, angle: nil,
                           skeleton: skeleton, squatFeatures: nil,
-                          category: .lowConfidence,
-                          feedback: FormFeedbackCategory.lowConfidence.feedbackText)
+                          category: .none,
+                          feedback: FormFeedbackCategory.none.feedbackText)
         }
 
         // ── Squat-specific early checks ──────────────────────────────────────
@@ -224,7 +234,7 @@ struct MovementAnalyzer {
             if hasUpperBody && (!hasKnees || !hasAnkles) {
                 return result(repCount: currentCount, stage: currentStage, angle: nil,
                               skeleton: skeleton, squatFeatures: nil,
-                              category: .bodyNotVisible,
+                              category: .none,
                               feedback: "Camera not low enough — point it down so your knees and ankles are visible.")
             }
         }
@@ -235,17 +245,17 @@ struct MovementAnalyzer {
         guard let angle else {
             return result(repCount: currentCount, stage: currentStage, angle: nil,
                           skeleton: skeleton, squatFeatures: nil,
-                          category: .bodyNotVisible,
+                          category: .none,
                           feedback: "Move back until your full body is visible to the camera.")
         }
 
-        // Compute squat features and let CoreML decide the live category
+        // Compute squat features and let classifier decide the live category
         let squatFeatures: SquatFeatures?
         let liveCategory: FormFeedbackCategory?
 
         if exercise == .squat {
-            let ratio = kneeAlignmentRatio(points: points) ?? 1.0
-            let features = SquatFeatures(kneeAngle: angle, kneeAlignmentRatio: ratio)
+            let torsoLean = torsoLeanAngle(points: points) ?? 0.0
+            let features  = SquatFeatures(kneeAngle: angle, torsoLeanAngle: torsoLean)
             squatFeatures = features
             liveCategory  = SquatFormClassifier.shared.classify(features: features)
         } else {
@@ -289,22 +299,36 @@ struct MovementAnalyzer {
         validatedPoint(for: joint, in: points) != nil
     }
 
-    // MARK: - Knee alignment ratio
+    // MARK: - Torso lean angle
 
-    private func kneeAlignmentRatio(
+    // Returns the angle (degrees) of the shoulder-to-hip line from vertical.
+    // 0° = perfectly upright; larger = more forward lean.
+    // Uses averaged left/right landmarks when both are visible.
+    private func torsoLeanAngle(
         points: [VNHumanBodyPoseObservation.JointName: VNRecognizedPoint]
     ) -> Double? {
-        guard
-            let lk = validatedPoint(for: .leftKnee,   in: points),
-            let rk = validatedPoint(for: .rightKnee,  in: points),
-            let la = validatedPoint(for: .leftAnkle,  in: points),
-            let ra = validatedPoint(for: .rightAnkle, in: points)
+        let ls = validatedPoint(for: .leftShoulder,  in: points)
+        let rs = validatedPoint(for: .rightShoulder, in: points)
+        let lh = validatedPoint(for: .leftHip,       in: points)
+        let rh = validatedPoint(for: .rightHip,      in: points)
+
+        func avg(_ a: CGPoint?, _ b: CGPoint?) -> CGPoint? {
+            switch (a, b) {
+            case let (.some(p), .some(q)): return CGPoint(x: (p.x + q.x) / 2, y: (p.y + q.y) / 2)
+            case let (.some(p), nil):      return p
+            case let (nil, .some(q)):      return q
+            default:                       return nil
+            }
+        }
+
+        guard let shoulder = avg(ls?.location, rs?.location),
+              let hip      = avg(lh?.location, rh?.location)
         else { return nil }
 
-        let kneeWidth  = abs(lk.location.x - rk.location.x)
-        let ankleWidth = abs(la.location.x - ra.location.x)
-        guard ankleWidth > 0.01 else { return nil }
-        return kneeWidth / ankleWidth
+        let dx = abs(shoulder.x - hip.x)
+        let dy = abs(shoulder.y - hip.y)
+        guard dy > 0.01 else { return 90.0 }
+        return atan2(dx, dy) * 180 / Double.pi
     }
 
     // MARK: - Non-squat feedback text
@@ -360,8 +384,11 @@ struct MovementAnalyzer {
         guard let points = try? observation.recognizedPoints(.all) else { return [] }
         return points.compactMap { joint, point in
             guard point.confidence >= minimumConfidence else { return nil }
+            // Vision outputs anatomical (un-mirrored) x because the handler receives
+            // the already-mirrored front-camera buffer with .upMirrored. Flip x so
+            // the skeleton overlay aligns with the mirrored preview on screen.
             return JointOverlayPoint(id: joint, joint: joint,
-                                     point: CGPoint(x: point.location.x, y: 1 - point.location.y),
+                                     point: CGPoint(x: 1 - point.location.x, y: 1 - point.location.y),
                                      confidence: point.confidence)
         }
     }

@@ -35,7 +35,7 @@ struct WorkoutFormReportView: View {
     // MARK: - Overall score card
 
     private var overallScoreCard: some View {
-        let goodCount = records.filter { $0.category == .goodForm }.count
+        let goodCount = records.filter { $0.category == .squatCorrect }.count
         let total = records.count
         let pct = total > 0 ? Double(goodCount) / Double(total) : 0.0
 
@@ -68,7 +68,7 @@ struct WorkoutFormReportView: View {
 
             // Show a pill for each category that appears in the session
             let categoryCounts = Dictionary(grouping: records, by: \.category).mapValues(\.count)
-            let pillOrder: [FormFeedbackCategory] = [.goodForm, .rangeIncomplete, .kneeAlignment, .bodyNotVisible, .lowConfidence]
+            let pillOrder: [FormFeedbackCategory] = [.squatCorrect, .squatTooShallow, .squatTorsoLean, .other, .none]
             let presentPills = pillOrder.filter { categoryCounts[$0] != nil }
 
             HStack(spacing: 0) {
@@ -115,7 +115,7 @@ struct WorkoutFormReportView: View {
     }
 
     private func exerciseCard(name: String, reps: [RepFormRecord]) -> some View {
-        let goodCount = reps.filter { $0.category == .goodForm }.count
+        let goodCount = reps.filter { $0.category == .squatCorrect }.count
         return VStack(alignment: .leading, spacing: 12) {
             HStack {
                 Text(name)
@@ -170,18 +170,18 @@ struct WorkoutFormReportView: View {
     }
 
     private func presentCategories(in reps: [RepFormRecord]) -> [FormFeedbackCategory] {
-        let order: [FormFeedbackCategory] = [.goodForm, .rangeIncomplete, .bodyNotVisible]
+        let order: [FormFeedbackCategory] = [.squatCorrect, .squatTooShallow, .squatTorsoLean, .other, .none]
         let present = Set(reps.map(\.category))
         return order.filter { present.contains($0) }
     }
 
     private func shortLabel(_ cat: FormFeedbackCategory) -> String {
         switch cat {
-        case .goodForm:        return "Good"
-        case .rangeIncomplete: return "Shallow"
-        case .kneeAlignment:   return "Knees"
-        case .bodyNotVisible:  return "No Pose"
-        case .lowConfidence:   return "Unclear"
+        case .squatCorrect:    return "Correct"
+        case .squatTooShallow: return "Shallow"
+        case .squatTorsoLean:  return "Torso Lean"
+        case .other:           return "Other"
+        case .none:            return "None"
         }
     }
 

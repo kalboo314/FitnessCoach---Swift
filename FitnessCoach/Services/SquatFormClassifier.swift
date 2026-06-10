@@ -54,13 +54,13 @@ final class SquatFormClassifier {
     // MARK: - CoreML path
 
     // Inputs match the feature names in GenerateSquatModel.py:
-    //   "knee_angle"           → Double
-    //   "knee_alignment_ratio" → Double
+    //   "knee_angle"        → Double
+    //   "torso_lean_angle"  → Double
     // Output feature name: "formClass" → String
     private func coreMLClassify(features: SquatFeatures, model: MLModel) -> FormFeedbackCategory? {
         guard let provider = try? MLDictionaryFeatureProvider(dictionary: [
-            "knee_angle":           NSNumber(value: features.kneeAngle),
-            "knee_alignment_ratio": NSNumber(value: features.kneeAlignmentRatio)
+            "knee_angle":       NSNumber(value: features.kneeAngle),
+            "torso_lean_angle": NSNumber(value: features.torsoLeanAngle)
         ]) else { return nil }
 
         guard let output = try? model.prediction(from: provider),
@@ -68,23 +68,38 @@ final class SquatFormClassifier {
         else { return nil }
 
         switch label {
-        case "goodForm":        return .goodForm
-        case "rangeIncomplete": return .rangeIncomplete
-        case "kneeAlignment":   return .kneeAlignment
+        case "squatCorrect":    return .squatCorrect
+        case "squatTooShallow": return .squatTooShallow
+        case "squatTorsoLean":  return .squatTorsoLean
+        case "other":           return .other
+        case "none":            return .none
         default:                return nil
         }
     }
 
     // MARK: - Rule-based fallback
     //
-    // Thresholds mirror the decision tree trained in GenerateSquatModel.py
-    // so behaviour is consistent whether the model file is present or not.
+    // Classification priority:
+    //   1. Torso nearly horizontal → other exercise (push-up, row, etc.)
+    //   2. Knee nearly straight → preparation / none
+    //   3. Excessive torso lean while squatting → squatTorsoLean
+    //   4. Not deep enough → squatTooShallow
+    //   5. Deep and upright → squatCorrect
     //
-    // Priority: knee alignment check first (a deep squat with valgus knees
-    // is still a form problem that needs flagging).
+    // Note on angle thresholds: torsoLeanAngle is computed from normalized Vision
+    // coordinates on a ~9:16 portrait image. The 16:9 aspect ratio inflates the
+    // computed angle vs the real-world angle by roughly (16/9)×, so thresholds are
+    // set higher than the equivalent real-world degrees:
+    //   real ~20° lean  → computed ~33°  → squatTorsoLean (threshold 30°)
+    //   real ~55° lean  → computed ~70°  → other (threshold 70°)
     private func ruleBasedClassify(features: SquatFeatures) -> FormFeedbackCategory {
-        if features.kneeAlignmentRatio < 0.75 { return .kneeAlignment }
-        if features.kneeAngle > 95             { return .rangeIncomplete }
-        return .goodForm
+        if features.torsoLeanAngle > 70    { return .other }
+        if features.kneeAngle > 155        { return .none }
+        // Depth is checked before torso lean — a shallow squat always reports depth
+        // first so the user corrects the most fundamental issue first.
+        // Torso lean is only flagged once the squat is actually deep enough.
+        if features.kneeAngle > 95         { return .squatTooShallow }
+        if features.torsoLeanAngle > 30    { return .squatTorsoLean }
+        return .squatCorrect
     }
 }

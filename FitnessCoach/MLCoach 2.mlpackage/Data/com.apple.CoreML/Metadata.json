@@ -1,15 +1,18 @@
 {
+  "MLModelVersionStringKey" : "--",
+  "MLModelDescriptionKey" : "--",
   "MLModelCreatorDefinedKey" : {
     "target" : "label",
     "com.apple.coreml.model.preview.type" : "actionClassifier",
     "Target Frame Rate" : "30.0",
     "classes" : "none,other,squat_correct,squat_too_shallow,squat_torso_lean",
     "com.apple.createml.version" : "13.6.0",
-    "com.apple.createml.app.tag" : "99.4",
     "max_iterations" : "80",
+    "com.apple.createml.app.tag" : "99.4",
     "type" : "action_classification",
     "com.apple.createml.app.version" : "4.0",
     "Prediction Window Size" : "60"
   },
-  "MLModelAuthorKey" : "Ramdani"
+  "MLModelAuthorKey" : "Ramdani",
+  "MLModelLicenseKey" : "--"
 }
